@@ -11,6 +11,12 @@ public struct MultiPicker<Bindee: Hashable, Content: View, LabelContent: View>: 
     public var body: some View {
         NavigationLink {
             MultiPickerSelectionList<Bindee, Content>(selection: selection, content: content)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        label
+                            .bold()
+                    }
+                }
         } label: {
             HStack {
                 label
