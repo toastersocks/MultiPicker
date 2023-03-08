@@ -46,6 +46,7 @@ public struct MultiPicker<Bindee: Hashable, Content: View, LabelContent: View>: 
         self.label = label()
     }
 
+    // NOTE: `@_disfavoredOverload` is used here because there's a bug (I think) in Swift's method overload resolution that causes this less specific `Binding<Bindee>` init to be favored over the more specific `Binding<Set<Bindee>>` variant. This does not happen when the overloads are non-init (`func`) methods.
     @_disfavoredOverload
     public init(selection: Binding<Bindee>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> LabelContent) {
         self.selection = SelectionBinding.single(selection)
@@ -59,23 +60,47 @@ public struct MultiPicker<Bindee: Hashable, Content: View, LabelContent: View>: 
         self.label = label()
     }
 
+    // NOTE: `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case)
+    @_disfavoredOverload
     public init<S: StringProtocol>(_ title: S, selection: Binding<Bindee?>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content
         self.label = Text(title)
     }
 
+    // `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case). Also using a dummy argument to **further** reduce the "favorability"/specificity of the method so that it has lower priority than both the `Binding<Set<Bindee>>` and `LocalizedStringKey` variants.
     @_disfavoredOverload
-    public init<S: StringProtocol>(_ title: S, selection: Binding<Bindee>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init<S: StringProtocol>(_ title: S, _ noOp: Void = Void(), selection: Binding<Bindee>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = Text(title)
     }
 
+    // @_disfavoredOverload is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case)
+    @_disfavoredOverload
     public init<S: StringProtocol>(_ title: S, selection: Binding<Set<Bindee>>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content
         self.label = Text(title)
+    }
+
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<Bindee?>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+        self.selection = SelectionBinding.oneOrNone(selection)
+        self.content = content
+        self.label = Text(titleKey)
+    }
+
+    // NOTE: Using a dummy parameter here to reduce the "specificity" of this init because there's a bug (I think) in Swift's method overload resolution that causes this less specific `Binding<Bindee>` init to be favored over the more specific `Binding<Set<Bindee>>` variant. This does not happen when the overloads are non-init (`func`) methods. Using a dummy argument instead of `@_disfavoredOverload` here because using `@_disfavoredOverload` causes the `init<S>(_ title:,selection:)` overload to be called instead.
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<Bindee>, noOp: Void = Void(), @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+        self.selection = SelectionBinding.single(selection)
+        self.content = content
+        self.label = Text(titleKey)
+    }
+
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<Set<Bindee>>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+        self.selection = SelectionBinding.multiple(selection)
+        self.content = content
+        self.label = Text(titleKey)
     }
 }
 
