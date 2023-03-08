@@ -6,7 +6,6 @@ public struct MultiPicker<SelectionValue: Hashable, Content: View, LabelContent:
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: () -> Content
     private var label: LabelContent
-    @State private var value: String = ""
 
     public var body: some View {
         NavigationLink {
