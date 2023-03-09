@@ -6,25 +6,33 @@ public struct MultiPicker<SelectionValue: Hashable, Content: View, LabelContent:
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: () -> Content
     private var label: LabelContent
+    @Environment(\.mpPickerStyle) var pickerStyle
+    @Environment(\.selectionIndicatorPosition) var selectionIndicatorPosition
 
     public var body: some View {
-        NavigationLink {
-            MultiPickerSelectionList<SelectionValue, Content>(selection: selection, content: content)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        label
-                            .bold()
+        switch pickerStyle {
+        case .inline:
+            MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
+                .scrollDisabled(true)
+        case .navigationLink:
+            NavigationLink {
+                MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
+                    .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            label
+                                .bold()
+                        }
                     }
+            } label: {
+                HStack {
+                    label
+                    Spacer()
+                    Text(text(forValue: selection))
+                        .accessibilityHidden(true)
+                        .foregroundColor(.secondary)
                 }
-        } label: {
-            HStack {
-                label
-                Spacer()
-                Text(text(forValue: selection))
-                    .accessibilityHidden(true)
-                .foregroundColor(.secondary)
+                .accessibilityValue(Text(text(forValue: selection)))
             }
-            .accessibilityValue(Text(text(forValue: selection)))
         }
     }
 
@@ -138,12 +146,12 @@ fileprivate enum SelectionBinding<SelectionValue: Hashable> {
 }
 
 
-public struct MultiPickerSelectionList<SelectionValue: Hashable, Content: View>: View {
+fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: View>: View {
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: Content
     @State private var selectionIndicatorPosition: SelectionIndicatorPosition
 
-    public var body: some View {
+    var body: some View {
         List {
             content.childViews { children in
                 ForEach(children) { child in
@@ -188,34 +196,29 @@ public struct MultiPickerSelectionList<SelectionValue: Hashable, Content: View>:
         }
     }
 
-    public init(selection: Binding<SelectionValue?>, indicatorPosition: SelectionIndicatorPosition = .leading, @ViewBuilder content: () -> Content) {
+    fileprivate init(selection: Binding<SelectionValue?>, indicatorPosition: SelectionIndicatorPosition = .trailing, @ViewBuilder content: () -> Content) {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content()
         self._selectionIndicatorPosition = State(initialValue: indicatorPosition)
     }
 
     @_disfavoredOverload
-    public init(selection: Binding<SelectionValue>, indicatorPosition: SelectionIndicatorPosition = .leading, @ViewBuilder content: () -> Content) {
+    fileprivate init(selection: Binding<SelectionValue>, indicatorPosition: SelectionIndicatorPosition = .trailing, @ViewBuilder content: () -> Content) {
         self.selection = SelectionBinding.single(selection)
         self.content = content()
         self._selectionIndicatorPosition = State(initialValue: indicatorPosition)
     }
 
-    public init(selection: Binding<Set<SelectionValue>>, indicatorPosition: SelectionIndicatorPosition = .leading, @ViewBuilder content: () -> Content) {
+    fileprivate init(selection: Binding<Set<SelectionValue>>, indicatorPosition: SelectionIndicatorPosition = .trailing, @ViewBuilder content: () -> Content) {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content()
         self._selectionIndicatorPosition = State(initialValue: indicatorPosition)
     }
 
-    fileprivate init(selection: SelectionBinding<SelectionValue>, indicatorPosition: SelectionIndicatorPosition = .leading, @ViewBuilder content: () -> Content) {
+    fileprivate init(selection: SelectionBinding<SelectionValue>, indicatorPosition: SelectionIndicatorPosition = .trailing, @ViewBuilder content: () -> Content) {
         self.selection = selection
         self.content = content()
         self._selectionIndicatorPosition = State(initialValue: indicatorPosition)
-    }
-
-    public enum SelectionIndicatorPosition {
-        case leading
-        case trailing
     }
 }
 
@@ -223,6 +226,49 @@ fileprivate struct Tag<V: Hashable>: _ViewTraitKey {
     static var defaultValue: V? { nil }
 }
 
+fileprivate struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
+    static var defaultValue: MultiPickerStyle = .inline
+}
+
+extension EnvironmentValues {
+    public var mpPickerStyle: MultiPickerStyle {
+        get { self[MultiPickerStyleEnvironmentKey.self] }
+        set { self[MultiPickerStyleEnvironmentKey.self] = newValue }
+    }
+}
+
+extension View {
+    public func mpPickerStyle(_ style: MultiPickerStyle) -> some View {
+        environment(\.mpPickerStyle, style)
+    }
+}
+
+fileprivate struct SelectionIndicatorPositionEnvironmentKey: EnvironmentKey {
+    static var defaultValue: SelectionIndicatorPosition = .trailing
+}
+
+extension EnvironmentValues {
+    public var selectionIndicatorPosition: SelectionIndicatorPosition {
+        get { self[SelectionIndicatorPositionEnvironmentKey.self] }
+        set { self[SelectionIndicatorPositionEnvironmentKey.self] = newValue }
+    }
+}
+
+extension View {
+    public func selectionIndicatorPosition(_ position: SelectionIndicatorPosition) -> some View {
+        environment(\.selectionIndicatorPosition, position)
+    }
+}
+
+public enum SelectionIndicatorPosition {
+    case leading
+    case trailing
+}
+
+public enum MultiPickerStyle {
+    case navigationLink
+    case inline
+}
 
 struct MultiPicker_Previews: PreviewProvider {
 
@@ -235,8 +281,8 @@ struct MultiPicker_Previews: PreviewProvider {
     static func multiPickerListPreview() -> some View {
         PreviewBindingHelper(choices: ["1", "2", "3"], value: (Set(arrayLiteral: "1"))) { (choices: [String], multiSelection: Binding<Set<String>>) in
 
-            VStack {
-                MultiPickerSelectionList(selection: multiSelection) {
+            Form {
+                MultiPicker("Regular", selection: multiSelection) {
                     ForEach(choices, id: \.self) {
                         Text("\($0)")
                             .mpTag($0)
@@ -298,6 +344,7 @@ struct MultiPicker_Previews: PreviewProvider {
                         }
                     }
                 }
+                .mpPickerStyle(.navigationLink)
             }
         }
     }
