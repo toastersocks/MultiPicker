@@ -38,12 +38,12 @@ public struct MultiPicker<SelectionValue: Hashable, Content: View, LabelContent:
 
     private func text(forValue: SelectionBinding<SelectionValue>) -> String {
         switch selection {
-        case .single(let bindee):
-            return String(describing: bindee.wrappedValue)
-        case .oneOrNone(let bindee):
-            return "\(bindee.wrappedValue.map { "\($0)" } ?? "(None)")"
-        case .multiple(let bindee):
-            return bindee.wrappedValue.map(String.init(describing:)).formatted(.list(type: .and))
+        case .single(let binding):
+            return String(describing: binding.wrappedValue)
+        case .oneOrNone(let binding):
+            return "\(binding.wrappedValue.map { "\($0)" } ?? "(None)")"
+        case .multiple(let binding):
+            return binding.wrappedValue.map(String.init(describing:)).formatted(.list(type: .and))
         }
     }
 
@@ -116,30 +116,30 @@ fileprivate enum SelectionBinding<SelectionValue: Hashable> {
     case oneOrNone(Binding<SelectionValue?>)
     case multiple(Binding<Set<SelectionValue>>)
 
-    func isSelected(_ bindee: SelectionValue) -> Bool {
+    func isSelected(_ bound: SelectionValue) -> Bool {
         switch self {
         case let .single(binding):
-            return bindee == binding.wrappedValue
+            return bound == binding.wrappedValue
         case let .oneOrNone(binding):
-            return bindee == binding.wrappedValue
+            return bound == binding.wrappedValue
         case let .multiple(binding):
-            return binding.wrappedValue.contains(bindee)
+            return binding.wrappedValue.contains(bound)
         }
     }
 
-    func select(_ bindee: SelectionValue) {
+    func select(_ bound: SelectionValue) {
         switch self {
         case let .single(binding):
-            guard isSelected(bindee) == false else { return }
+            guard isSelected(bound) == false else { return }
 
-            binding.wrappedValue = bindee
+            binding.wrappedValue = bound
         case let .oneOrNone(binding):
-            binding.wrappedValue = isSelected(bindee) ? nil : bindee
+            binding.wrappedValue = isSelected(bound) ? nil : bound
         case let .multiple(binding):
-            if isSelected(bindee) {
-                binding.wrappedValue.remove(bindee)
+            if isSelected(bound) {
+                binding.wrappedValue.remove(bound)
             } else {
-                binding.wrappedValue.insert(bindee)
+                binding.wrappedValue.insert(bound)
             }
         }
     }
