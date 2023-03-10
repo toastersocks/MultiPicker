@@ -1,7 +1,7 @@
 import SwiftUI
 
 
-public struct MultiPicker<SelectionValue: Hashable, Content: View, LabelContent: View>: View {
+public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Content: View, LabelContent: View>: View {
 
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: () -> Content
