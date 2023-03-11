@@ -349,3 +349,12 @@ struct MultiPicker_Previews: PreviewProvider {
     }
 }
 
+public struct MPTag: _ViewTraitKey {
+    static public var defaultValue: AnyHashable? = Int?.none
+}
+
+public extension View {
+    func mpTag<Value: Hashable>(_ value: Value) -> some View {
+        _trait(MPTag.self, value)
+    }
+}
