@@ -1,11 +1,11 @@
 import SwiftUI
 
 
-public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Content: View, LabelContent: View>: View {
+public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringConvertible, Content: View>: View {
 
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: () -> Content
-    private var label: LabelContent
+    private var label: Label
     @Environment(\.mpPickerStyle) var pickerStyle
     @Environment(\.selectionIndicatorPosition) var selectionIndicatorPosition
 
@@ -46,7 +46,7 @@ public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Co
         }
     }
 
-    public init(selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> LabelContent) {
+    public init(selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> Label) {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content
         self.label = label()
@@ -54,13 +54,13 @@ public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Co
 
     // NOTE: `@_disfavoredOverload` is used here because there's a bug (I think) in Swift's method overload resolution that causes this less specific `Binding<SelectionValue>` init to be favored over the more specific `Binding<Set<SelectionValue>>` variant. This does not happen when the overloads are non-init (`func`) methods.
     @_disfavoredOverload
-    public init(selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> LabelContent) {
+    public init(selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> Label) {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = label()
     }
 
-    public init(selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> LabelContent) {
+    public init(selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> Label) {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content
         self.label = label()
@@ -68,7 +68,7 @@ public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Co
 
     // NOTE: `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case)
     @_disfavoredOverload
-    public init<S: StringProtocol>(_ title: S, selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init<S: StringProtocol>(_ title: S, selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content
         self.label = Text(title)
@@ -76,7 +76,7 @@ public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Co
 
     // `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case). Also using a dummy argument to **further** reduce the "favorability"/specificity of the method so that it has lower priority than both the `Binding<Set<SelectionValue>>` and `LocalizedStringKey` variants.
     @_disfavoredOverload
-    public init<S: StringProtocol>(_ title: S, _ noOp: Void = Void(), selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init<S: StringProtocol>(_ title: S, _ noOp: Void = Void(), selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = Text(title)
@@ -84,26 +84,26 @@ public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Co
 
     // @_disfavoredOverload is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case)
     @_disfavoredOverload
-    public init<S: StringProtocol>(_ title: S, selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init<S: StringProtocol>(_ title: S, selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content
         self.label = Text(title)
     }
 
-    public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content
         self.label = Text(titleKey)
     }
 
     // NOTE: Using a dummy parameter here to reduce the "specificity" of this init because there's a bug (I think) in Swift's method overload resolution that causes this less specific `Binding<SelectionValue>` init to be favored over the more specific `Binding<Set<SelectionValue>>` variant. This does not happen when the overloads are non-init (`func`) methods. Using a dummy argument instead of `@_disfavoredOverload` here because using `@_disfavoredOverload` causes the `init<S>(_ title:,selection:)` overload to be called instead.
-    public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue>, noOp: Void = Void(), @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue>, noOp: Void = Void(), @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = Text(titleKey)
     }
 
-    public init(_ titleKey: LocalizedStringKey, selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content) where LabelContent == Text {
+    public init(_ titleKey: LocalizedStringKey, selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content
         self.label = Text(titleKey)
