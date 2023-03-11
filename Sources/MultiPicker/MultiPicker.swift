@@ -13,14 +13,13 @@ public struct MultiPicker<SelectionValue: Hashable & CustomStringConvertible, Co
         switch pickerStyle {
         case .inline:
             MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
-                .scrollDisabled(true)
         case .navigationLink:
             NavigationLink {
                 MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
                     .toolbar {
                         ToolbarItem(placement: .principal) {
                             label
-                                .bold()
+                                .backport.bold()
                         }
                     }
             } label: {
@@ -169,7 +168,7 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                             .resizable()
                             .fixedSize()
                             .font(.body)
-                            .fontWeight(.semibold)
+                            .backport.fontWeight(.semibold)
                             .padding(.horizontal, 10)
                             .foregroundColor(.accentColor)
                             .opacity(tag.map { selection.isSelected($0) ? 1 : 0 } ?? 0)
@@ -322,7 +321,7 @@ struct MultiPicker_Previews: PreviewProvider {
                     }
                 }
                 #if !os(macOS)
-                .pickerStyle(.navigationLink)
+//                .pickerStyle(.navigationLink)
                 #endif
                 Section("MultiPicker") {
                     MultiPicker("Only One", selection: oneSelection) {
