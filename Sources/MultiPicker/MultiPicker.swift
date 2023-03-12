@@ -221,11 +221,11 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
     }
 }
 
-fileprivate struct Tag<V: Hashable>: _ViewTraitKey {
+struct Tag<V: Hashable>: _ViewTraitKey {
     static var defaultValue: V? { nil }
 }
 
-fileprivate struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
+struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
     static var defaultValue: MultiPickerStyle = .inline
 }
 
@@ -242,12 +242,12 @@ extension View {
     }
 }
 
-fileprivate struct SelectionIndicatorPositionEnvironmentKey: EnvironmentKey {
+struct SelectionIndicatorPositionEnvironmentKey: EnvironmentKey {
     static var defaultValue: SelectionIndicatorPosition = .trailing
 }
 
 extension EnvironmentValues {
-    public var selectionIndicatorPosition: SelectionIndicatorPosition {
+    var selectionIndicatorPosition: SelectionIndicatorPosition {
         get { self[SelectionIndicatorPositionEnvironmentKey.self] }
         set { self[SelectionIndicatorPositionEnvironmentKey.self] = newValue }
     }
