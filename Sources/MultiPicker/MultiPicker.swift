@@ -1,4 +1,5 @@
 import SwiftUI
+import Helpers
 
 
 public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringConvertible, Content: View>: View {
@@ -278,29 +279,29 @@ struct MultiPicker_Previews: PreviewProvider {
     }
 
     static func multiPickerListPreview() -> some View {
-        PreviewBindingHelper(choices: ["1", "2", "3"], value: (Set(arrayLiteral: "1"))) { (choices: [String], multiSelection: Binding<Set<String>>) in
+        PreviewBindingHelper2(values: (["1", "2", "3"], Set(arrayLiteral: "1"))) { (choices: Binding<[String]>, multiSelection: Binding<Set<String>>) in
 
             Form {
                 MultiPicker("Regular", selection: multiSelection) {
-                    ForEach(choices, id: \.self) {
+                    ForEach(choices.wrappedValue, id: \.self) {
                         Text("\($0)")
                             .mpTag($0)
                     }
                 }
                 MultiPickerSelectionList(selection: multiSelection, indicatorPosition: .trailing) {
-                    ForEach(choices, id: \.self) {
+                    ForEach(choices.wrappedValue, id: \.self) {
                         Text("\($0)")
                             .mpTag($0)
                     }
                 }
                 MultiPickerSelectionList(selection: multiSelection) {
-                    ForEach(choices, id: \.self) {
+                    ForEach(choices.wrappedValue, id: \.self) {
                         Text("\($0)")
                             .mpTag($0)
                     }
                 }.environment(\.layoutDirection, .rightToLeft)
                 MultiPickerSelectionList(selection: multiSelection, indicatorPosition: .trailing) {
-                    ForEach(choices, id: \.self) {
+                    ForEach(choices.wrappedValue, id: \.self) {
                         Text("\($0)")
                             .mpTag($0)
                     }
@@ -310,11 +311,11 @@ struct MultiPicker_Previews: PreviewProvider {
     }
 
     static func multiPickerPreview() -> some View {
-        PreviewBindingHelper3(choices: ["1", "2", "3"], values: ("1", Optional<String>("1"), Set(arrayLiteral: "1") as Set<String>)) { (choices: [String], oneSelection: Binding<String>, oneOrNoneSelection: Binding<String?>, multiSelection: Binding<Set<String>>) in
+        PreviewBindingHelper4(values: (["1", "2", "3"], "1", Optional<String>("1"), Set(arrayLiteral: "1") as Set<String>)) { (choices: Binding<[String]>, oneSelection: Binding<String>, oneOrNoneSelection: Binding<String?>, multiSelection: Binding<Set<String>>) in
             Form {
                 Section("SwiftUI") {
                     Picker("Only One", selection: oneSelection) {
-                        ForEach(choices, id: \.self) {
+                        ForEach(choices.wrappedValue, id: \.self) {
                             Text("\($0)")
                                 .tag($0)
                         }
@@ -325,19 +326,19 @@ struct MultiPicker_Previews: PreviewProvider {
                 #endif
                 Section("MultiPicker") {
                     MultiPicker("Only One", selection: oneSelection) {
-                        ForEach(choices, id: \.self) {
+                        ForEach(choices.wrappedValue, id: \.self) {
                             Text("\($0)")
                                 .mpTag($0)
                         }
                     }
                     MultiPicker("Multi", selection: multiSelection as Binding<Set<String>>) {
-                        ForEach(choices, id: \.self) {
+                        ForEach(choices.wrappedValue, id: \.self) {
                             Text("\($0)")
                                 .mpTag($0)
                         }
                     }
                     MultiPicker("One or None", selection: oneOrNoneSelection) {
-                        ForEach(choices, id: \.self) {
+                        ForEach(choices.wrappedValue, id: \.self) {
                             Text("\($0)")
                                 .mpTag($0)
                         }
