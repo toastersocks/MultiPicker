@@ -275,7 +275,7 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
     }
 }
 
-
+// MARK: - Previews
 struct MultiPicker_Previews: PreviewProvider {
 
     static var previews: some View {
