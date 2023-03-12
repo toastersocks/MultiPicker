@@ -2,6 +2,12 @@ import SwiftUI
 import Helpers
 
 
+/// A picker for selecting from multiple options.
+///
+/// A MultiPicker can be initialized with several configurations, depending on what kind of binding is passed into the initializer. It can be configured to select between...
+/// - one of any number of mutually-exclusive options by passing in a binding to a non-optional value.
+/// - one or zero of any number of mutually-exclusive options by passing in a binding to an optional value.
+/// - one, zero, or many of any number of options by passing in a binding to a set of option values.
 public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringConvertible, Content: View>: View {
 
     private var selection: SelectionBinding<SelectionValue>
@@ -48,6 +54,11 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     }
 
     // NOTE: `@_disfavoredOverload` is used here because there's a bug (I think) in Swift's method overload resolution that causes this less specific `Binding<SelectionValue>` init to be favored over the more specific `Binding<Set<SelectionValue>>` variant. This does not happen when the overloads are non-init (`func`) methods.
+    /// Creates a `MultiPicker` with a custom label for a single, mutually exclusive value.
+    /// - Parameters:
+    ///   - selection: A binding to a property that determines the currently selected option.
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
+    ///   - label: A view describing the option.
     @_disfavoredOverload
     public init(selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> Label) {
         self.selection = SelectionBinding.single(selection)
@@ -55,19 +66,35 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
         self.label = label()
     }
 
+    /// Creates a `MultiPicker` with a custom label for a single, mutually exclusive, optional value.
+    /// - Parameters:
+    ///   - selection: A binding to a property that determines the currently selected option. No value is selected if the selection value is `nil`.
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
+    ///   - label: A view describing the option.
     public init(selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> Label) {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content
         self.label = label()
     }
 
+    /// Creates a `MultiPicker` with a custom label for multiple, mutually inclusive options. One, multiple or zero options can be selected at once.
+    /// - Parameters:
+    ///   - selection: A binding to a property that determines the currently selected option(s).
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
+    ///   - label: A view describing the option.
     public init(selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content, @ViewBuilder label: () -> Label) {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content
         self.label = label()
     }
 
-    // `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case). Also using a dummy argument to **further** reduce the "favorability"/specificity of the method so that it has lower priority than both the `Binding<Set<SelectionValue>>` and `LocalizedStringKey` variants.
+    // NOTE: `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case). Also using a dummy argument to **further** reduce the "favorability"/specificity of the method so that it has lower priority than both the `Binding<Set<SelectionValue>>` and `LocalizedStringKey` variants.
+    /// Creates a `MultiPicker` for a single, mutually exclusive value. The picker's label is created from a string.
+    /// >  Note: The `Void` `noOP` parameter is a dummy parameter that ensures the proper overloaded initializer is called. Do not use or include this parameter when calling this initializer. It does nothing.
+    /// - Parameters:
+    ///   - title: A string describing the picker's purpose.
+    ///   - selection: A binding to a property that determines the currently selected option.
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     @_disfavoredOverload
     public init<S: StringProtocol>(_ title: S, _ noOp: Void = Void(), selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.single(selection)
@@ -76,6 +103,11 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     }
 
     // NOTE: `@_disfavoredOverload` is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case)
+    /// Creates a `MultiPicker` for a single, mutually exclusive optional value. The picker's label is created from a string.
+    /// - Parameters:
+    ///   - title: A string describing the picker's purpose.
+    ///   - selection: A binding to a property that determines the currently selected option. No value is selected if the selection value is `nil`.
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     @_disfavoredOverload
     public init<S: StringProtocol>(_ title: S, selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.oneOrNone(selection)
@@ -84,6 +116,11 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     }
 
     // @_disfavoredOverload is used here because there's a bug(?)(I can't find the Swift forum post to link to) where the `ExpressibleBy...` protocol variants are erroneously preferred by the compiler over the concrete types (`LocalizedStringKey` in this case)
+    /// Creates a `MultiPicker` for multiple, mutually inclusive options. One, multiple or zero options can be selected at once. The picker's label is created from a string.
+    /// - Parameters:
+    ///   - title: A string describing the picker's purpose.
+    ///   - selection: A binding to a property that determines the currently selected option(s).
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     @_disfavoredOverload
     public init<S: StringProtocol>(_ title: S, selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.multiple(selection)
@@ -92,18 +129,34 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     }
 
     // NOTE: Using a dummy parameter here to reduce the "specificity" of this init because there's a bug (I think) in Swift's method overload resolution that causes this less specific `Binding<SelectionValue>` init to be favored over the more specific `Binding<Set<SelectionValue>>` variant. This does not happen when the overloads are non-init (`func`) methods. Using a dummy argument instead of `@_disfavoredOverload` here because using `@_disfavoredOverload` causes the `init<S>(_ title:,selection:)` overload to be called instead.
+    /// Creates a `MultiPicker` for a single, mutually exclusive value. The picker's label is created from a string.
+    /// >  Note: The `Void` `noOP` parameter is a dummy parameter that ensures the proper overloaded initializer is called. Do not use or include this parameter when calling this initializer. It does nothing.
+    /// - Parameters:
+    ///   - titleKey: A localized string key describing the picker's purpose.
+    ///   - selection: A binding to a property that determines the currently selected option.
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue>, noOp: Void = Void(), @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = Text(titleKey)
     }
 
+    /// Creates a `MultiPicker` for a single, mutually exclusive optional value. The picker's label is created from a string.
+    /// - Parameters:
+    ///   - titleKey: A localized string key describing the picker's purpose.
+    ///   - selection: A binding to a property that determines the currently selected option. No value is selected if the selection value is `nil`.
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue?>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.oneOrNone(selection)
         self.content = content
         self.label = Text(titleKey)
     }
 
+    /// Creates a `MultiPicker` for multiple, mutually inclusive options. One, multiple or zero options can be selected at once. The picker's label is created from a string.
+    /// - Parameters:
+    ///   - titleKey: A localized string key describing the picker's purpose.
+    ///   - selection: A binding to a property that determines the currently selected option(s).
+    ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     public init(_ titleKey: LocalizedStringKey, selection: Binding<Set<SelectionValue>>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
         self.selection = SelectionBinding.multiple(selection)
         self.content = content
@@ -146,6 +199,7 @@ fileprivate enum SelectionBinding<SelectionValue: Hashable> {
 }
 
 
+/// This is used internally for the option picker view.
 fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: View>: View {
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: Content
@@ -237,6 +291,10 @@ extension EnvironmentValues {
 }
 
 extension View {
+
+    /// Sets the style of ``MultiPicker``s in the view.
+    /// - Parameter style: The desired style. Currently only inline and navigationLink are supported.
+    /// - Returns: A view with the multi picker style set.
     public func mpPickerStyle(_ style: MultiPickerStyle) -> some View {
         environment(\.mpPickerStyle, style)
     }
@@ -254,18 +312,30 @@ extension EnvironmentValues {
 }
 
 extension View {
+
+    /// Sets the selection indicator position for the view.
+    /// - Parameter position: Sets the selection indicator to be either leading or trailing.
+    /// - Returns: A view with the selection indicator position set.
     public func selectionIndicatorPosition(_ position: SelectionIndicatorPosition) -> some View {
         environment(\.selectionIndicatorPosition, position)
     }
 }
 
+
+/// Represents the position of the selection indicator (usually a checkmark on iOS).
 public enum SelectionIndicatorPosition {
+    /// The selection indicator appears before the option view. This can be either the left or right depending on the current user's locale.
     case leading
+    /// The selection indicator appears after the option view. This can be either the left or right depending on the current user's locale.
     case trailing
 }
 
+
+/// The style of the `MultiPicker`. Currently only navigation link style and inline list style are supported.
 public enum MultiPickerStyle {
+    /// The picker displays as a navigation link that pushes a list style picker view.
     case navigationLink
+    /// The picker displays a list style picker view inline with other views.
     case inline
 }
 
