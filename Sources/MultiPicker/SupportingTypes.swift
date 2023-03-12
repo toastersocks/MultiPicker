@@ -54,7 +54,7 @@ extension View {
 
 // MARK: - Internal API
 struct MPTag: _ViewTraitKey {
-    static public var defaultValue: AnyHashable? = Int?.none
+    static var defaultValue: AnyHashable? = Int?.none
 }
 
 struct Tag<V: Hashable>: _ViewTraitKey {
@@ -66,7 +66,7 @@ struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    public var mpPickerStyle: MultiPickerStyle {
+    var mpPickerStyle: MultiPickerStyle {
         get { self[MultiPickerStyleEnvironmentKey.self] }
         set { self[MultiPickerStyleEnvironmentKey.self] = newValue }
     }
