@@ -57,10 +57,6 @@ struct MPTag: _ViewTraitKey {
     static var defaultValue: AnyHashable? = Int?.none
 }
 
-struct Tag<V: Hashable>: _ViewTraitKey {
-    static var defaultValue: V? { nil }
-}
-
 struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
     static var defaultValue: MultiPickerStyle = .inline
 }
