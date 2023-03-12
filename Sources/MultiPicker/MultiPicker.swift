@@ -269,6 +269,20 @@ public enum MultiPickerStyle {
     case inline
 }
 
+struct MPTag: _ViewTraitKey {
+    static public var defaultValue: AnyHashable? = Int?.none
+}
+
+public extension View {
+    /// Use this view modifier to tag the views representing the picker's options and associate them with the selection values they represent.
+    /// - Parameter value: A `Hashable` value representing the option. Use this to associate a selection value with the view that represents it.
+    /// - Returns: A view tagged with the supplied `value`
+    func mpTag<Value: Hashable>(_ value: Value) -> some View {
+        _trait(MPTag.self, value)
+    }
+}
+
+
 struct MultiPicker_Previews: PreviewProvider {
 
     static var previews: some View {
@@ -346,15 +360,5 @@ struct MultiPicker_Previews: PreviewProvider {
                 .mpPickerStyle(.navigationLink)
             }
         }
-    }
-}
-
-public struct MPTag: _ViewTraitKey {
-    static public var defaultValue: AnyHashable? = Int?.none
-}
-
-public extension View {
-    func mpTag<Value: Hashable>(_ value: Value) -> some View {
-        _trait(MPTag.self, value)
     }
 }
