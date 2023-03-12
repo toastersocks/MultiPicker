@@ -158,7 +158,6 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                     let tag = child[MPTag.self].flatMap {
                         $0 as? SelectionValue
                     }
-//                    let _ = print(tag as Any)
                     HStack(spacing: 4) {
                         if selectionIndicatorPosition == .trailing {
                             child
