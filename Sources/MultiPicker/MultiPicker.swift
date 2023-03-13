@@ -212,9 +212,10 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                     let tag = child[MPTag.self].flatMap {
                         $0 as? SelectionValue
                     }
+                    let paddedChild = child.padding(.vertical, 4)
                     HStack(spacing: 4) {
                         if selectionIndicatorPosition == .trailing {
-                            child
+                            paddedChild
                                 .padding(.horizontal)
                             Spacer()
                         }
@@ -229,7 +230,7 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                             .accessibility(hidden: true)
                             .padding(.trailing, selectionIndicatorPosition == .trailing ? nil : 0)
                         if selectionIndicatorPosition == .leading {
-                            child
+                            paddedChild
                             Spacer()
                         }
                     }
