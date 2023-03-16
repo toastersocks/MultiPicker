@@ -318,38 +318,47 @@ struct MultiPicker_Previews: PreviewProvider {
 
     static var previews: some View {
         multiPickerListPreview()
-
+            .previewDisplayName("List Style")
         multiPickerPreview()
+            .previewDisplayName("Navigation Link Style")
     }
 
     static func multiPickerListPreview() -> some View {
         PreviewBindingHelper2(values: (["1", "2", "3"], Set(arrayLiteral: "1"))) { (choices: Binding<[String]>, multiSelection: Binding<Set<String>>) in
 
             Form {
-                MultiPicker("Regular", selection: multiSelection) {
-                    ForEach(choices.wrappedValue, id: \.self) {
-                        Text("\($0)")
-                            .mpTag($0)
+                Section {
+                    MultiPicker("Regular", selection: multiSelection) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
                     }
                 }
-                MultiPickerSelectionList(selection: multiSelection, indicatorPosition: .trailing) {
-                    ForEach(choices.wrappedValue, id: \.self) {
-                        Text("\($0)")
-                            .mpTag($0)
+                Section {
+                    MultiPickerSelectionList(selection: multiSelection, indicatorPosition: .trailing) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
                     }
                 }
-                MultiPickerSelectionList(selection: multiSelection) {
-                    ForEach(choices.wrappedValue, id: \.self) {
-                        Text("\($0)")
-                            .mpTag($0)
-                    }
-                }.environment(\.layoutDirection, .rightToLeft)
-                MultiPickerSelectionList(selection: multiSelection, indicatorPosition: .trailing) {
-                    ForEach(choices.wrappedValue, id: \.self) {
-                        Text("\($0)")
-                            .mpTag($0)
-                    }
-                }.environment(\.layoutDirection, .rightToLeft)
+                Section {
+                    MultiPickerSelectionList(selection: multiSelection) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
+                    }.environment(\.layoutDirection, .rightToLeft)
+                }
+                Section {
+                    MultiPickerSelectionList(selection: multiSelection, indicatorPosition: .trailing) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
+                    }.environment(\.layoutDirection, .rightToLeft)
+                }
             }
         }
     }
