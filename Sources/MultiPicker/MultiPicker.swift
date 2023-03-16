@@ -35,31 +35,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
                 HStack {
                     label
                         .layoutPriority(0.5)
-                    Group {
-                        switch choiceRepresentationStyle {
-                        case .plainText:
-                            Spacer()
-                            Text(text(forValue: selection))
-                        case .rich:
-                            if selection.isNone {
-                                Spacer()
-                                Text(noneText)
-                            } else {
-                                Spacer()
-                                Flow {
-                                    content().childViews { children in
-                                        ForEach(children) { child in
-                                            if let tag = child[MPTag.self].flatMap({
-                                                $0 as? SelectionValue
-                                            }), selection.isSelected(tag) {
-                                                child
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    selectedOptions()
                 }
                 .accessibilityHidden(true)
                 .foregroundColor(.secondary)
@@ -68,6 +44,28 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
         }
     }
 
+    func selectedOptions() -> some View {
+        Group {
+            switch choiceRepresentationStyle {
+            case .plainText:
+                Spacer()
+                Text(text(forValue: selection))
+            case .rich:
+                if selection.isNone {
+                    Spacer()
+                    Text(noneText)
+                } else {
+                    Spacer()
+                    Flow {
+                        content().childViews { children in
+                            ForEach(children) { child in
+                                if let tag = child[MPTag.self].flatMap({
+                                    $0 as? SelectionValue
+                                }), selection.isSelected(tag) {
+                                    child
+                                }
+                            }
+                        }
                     }
                 }
             }
