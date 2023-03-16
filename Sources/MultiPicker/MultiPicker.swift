@@ -41,24 +41,30 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
                             Spacer()
                             Text(text(forValue: selection))
                         case .rich:
-                            Flow {
-                                content().childViews { children in
-                                    ForEach(children) { child in
-                                        if let tag = child[MPTag.self].flatMap({
-                                            $0 as? SelectionValue
-                                        }), selection.isSelected(tag) {
-                                            child
+                            if selection.isNone {
+                                Spacer()
+                                Text(noneText)
+                            } else {
+                                Spacer()
+                                Flow {
+                                    content().childViews { children in
+                                        ForEach(children) { child in
+                                            if let tag = child[MPTag.self].flatMap({
+                                                $0 as? SelectionValue
+                                            }), selection.isSelected(tag) {
+                                                child
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                        .accessibilityHidden(true)
-                        .foregroundColor(.secondary)
                 }
-                .accessibilityValue(Text(text(forValue: selection)))
+                .accessibilityHidden(true)
+                .foregroundColor(.secondary)
             }
+            .accessibilityValue(Text(text(forValue: selection)))
         }
     }
 
@@ -202,6 +208,17 @@ fileprivate enum SelectionBinding<SelectionValue: Hashable>: Equatable {
     case single(Binding<SelectionValue>)
     case oneOrNone(Binding<SelectionValue?>)
     case multiple(Binding<Set<SelectionValue>>)
+
+    var isNone: Bool {
+        switch self {
+        case .oneOrNone(let binding) where binding.wrappedValue == nil:
+            return true
+        case .multiple(let binding) where binding.wrappedValue.isEmpty:
+            return true
+        default:
+            return false
+        }
+    }
 
     func isSelected(_ bound: SelectionValue) -> Bool {
         switch self {
