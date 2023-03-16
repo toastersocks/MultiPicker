@@ -13,6 +13,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: () -> Content
     private var label: Label
+    private var noneText = String(localized: "(None)")
     @Environment(\.mpPickerStyle) var pickerStyle
     @Environment(\.selectionIndicatorPosition) var selectionIndicatorPosition
     @Environment(\.choiceRepresentationStyle) var choiceRepresentationStyle
@@ -79,7 +80,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
         case .single(let binding):
             return String(describing: binding.wrappedValue)
         case .oneOrNone(let binding):
-            return "\(binding.wrappedValue.map { "\($0)" } ?? "(None)")"
+            return "\(binding.wrappedValue.map { "\($0)" } ?? "\(noneText)")"
         case .multiple(let binding):
             return binding.wrappedValue.map(String.init(describing:)).formatted(.list(type: .and))
         }
