@@ -68,14 +68,6 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
         }
     }
 
-    func getSelectedViews() -> some View {
-        HStack {
-            content().childViews { children in
-                ForEach(children) { child in
-                    if let tag = child[MPTag.self].flatMap({
-                        $0 as? SelectionValue
-                    }), selection.isSelected(tag) {
-                        child
                     }
                 }
             }
