@@ -15,6 +15,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     private var label: Label
     @Environment(\.mpPickerStyle) var pickerStyle
     @Environment(\.selectionIndicatorPosition) var selectionIndicatorPosition
+    @Environment(\.choiceRepresentationStyle) var choiceRepresentationStyle
 
     public var body: some View {
         switch pickerStyle {
@@ -32,12 +33,43 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
             } label: {
                 HStack {
                     label
-                    Spacer()
-                    Text(text(forValue: selection))
+                    Group {
+                        switch choiceRepresentationStyle {
+                        case .plainText:
+                            Spacer()
+                            Text(text(forValue: selection))
+                        case .rich:
+                            Flow {
+                                content().childViews { children in
+                                    ForEach(children) { child in
+                                        if let tag = child[MPTag.self].flatMap({
+                                            $0 as? SelectionValue
+                                        }), selection.isSelected(tag) {
+                                            child
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                         .accessibilityHidden(true)
                         .foregroundColor(.secondary)
                 }
                 .accessibilityValue(Text(text(forValue: selection)))
+            }
+        }
+    }
+
+    func getSelectedViews() -> some View {
+        HStack {
+            content().childViews { children in
+                ForEach(children) { child in
+                    if let tag = child[MPTag.self].flatMap({
+                        $0 as? SelectionValue
+                    }), selection.isSelected(tag) {
+                        child
+                    }
+                }
             }
         }
     }
@@ -164,7 +196,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     }
 }
 
-fileprivate enum SelectionBinding<SelectionValue: Hashable> {
+fileprivate enum SelectionBinding<SelectionValue: Hashable>: Equatable {
     case single(Binding<SelectionValue>)
     case oneOrNone(Binding<SelectionValue?>)
     case multiple(Binding<Set<SelectionValue>>)
@@ -219,16 +251,7 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                                 .padding(.horizontal)
                             Spacer()
                         }
-                        Image(systemName: "checkmark")
-                            .resizable()
-                            .fixedSize()
-                            .font(.body)
-                            .backport.fontWeight(.semibold)
-                            .padding(.horizontal, 10)
-                            .foregroundColor(.accentColor)
-                            .opacity(tag.map { selection.isSelected($0) ? 1 : 0 } ?? 0)
-                            .accessibility(hidden: true)
-                            .padding(.trailing, selectionIndicatorPosition == .trailing ? nil : 0)
+                        checkmark(tag: tag)
                         if selectionIndicatorPosition == .leading {
                             paddedChild
                             Spacer()
@@ -248,6 +271,19 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                 }
             }
         }
+    }
+
+    @ViewBuilder private func checkmark(tag: SelectionValue?) -> some View {
+        Image(systemName: "checkmark")
+            .resizable()
+            .fixedSize()
+            .font(.body)
+            .backport.fontWeight(.semibold)
+            .padding(.horizontal, 10)
+            .foregroundColor(.accentColor)
+            .opacity(tag.map { selection.isSelected($0) ? 1 : 0 } ?? 0)
+            .accessibility(hidden: true)
+            .padding(.trailing, selectionIndicatorPosition == .trailing ? nil : 0)
     }
 
     fileprivate init(selection: Binding<SelectionValue?>, indicatorPosition: SelectionIndicatorPosition = .trailing, @ViewBuilder content: () -> Content) {
