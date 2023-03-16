@@ -34,6 +34,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
             } label: {
                 HStack {
                     label
+                        .layoutPriority(0.5)
                     Group {
                         switch choiceRepresentationStyle {
                         case .plainText:
