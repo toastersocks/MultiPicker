@@ -51,7 +51,7 @@ struct MyView: View {
 }
 ```
 
-Check the [documentation](https://swiftpackageindex.com/toastersocks/MultiPicker/v1.0.1/documentation/multipicker) for more in-depth usage.
+Check the [documentation](https://swiftpackageindex.com/toastersocks/MultiPicker/main/documentation/multipicker) for more in-depth usage.
 
 ## Installing
 
