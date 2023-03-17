@@ -3,6 +3,8 @@
 [![po](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPickerb%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/toastersocks/MultiPicker)
 [![po](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPicker%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/toastersocks/MultiPicker)
 
+---
+
 ## A picker for selecting from multiple options. Or no options
 
 SwiftUI's `Picker` on iOS only allows choosing exactly one option. If you need a picker that allows selecting one optional value, or multiple values from a set, you're outta luck. MultiPicker can do all three!
@@ -49,7 +51,7 @@ struct MyView: View {
 }
 ```
 
-Check the ![documentation](https://swiftpackageindex.com/toastersocks/DelayedJob/v1.0.2/documentation/multiPicker) for more in-depth usage.
+Check the [documentation](https://swiftpackageindex.com/toastersocks/MultiPicker/v1.0.0/documentation/multipicker) for more in-depth usage.
 
 ## Installing
 
