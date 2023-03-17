@@ -37,9 +37,8 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
                         .layoutPriority(0.5)
                     selectedOptions()
                         .accessibilityHidden(true)
+                        .foregroundColor(.secondary)
                 }
-
-                .foregroundColor(.secondary)
             }
             .accessibilityValue(Text(text(forValue: selection)))
         }
