@@ -129,7 +129,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     ///   - selection: A binding to a property that determines the currently selected option.
     ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
     @_disfavoredOverload
-    public init<S: StringProtocol>(_ title: S, _ noOp: Void = Void(), selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content) where Label == Text {
+    public init<S: StringProtocol, SelectionVal: Hashable & CustomStringConvertible>(_ title: S, selection: Binding<SelectionVal>, @ViewBuilder content: @escaping () -> Content) where Label == Text, SelectionVal == SelectionValue {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = Text(title)
@@ -168,7 +168,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     ///   - titleKey: A localized string key describing the picker's purpose.
     ///   - selection: A binding to a property that determines the currently selected option.
     ///   - content: Views representing the picker's options. Tag each view with the ``mpTag(_:)`` modifier passing in a unique hashable value that identifies that option.
-    public init(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue>, noOp: Void = Void(), @ViewBuilder content: @escaping () -> Content) where Label == Text {
+    public init<SelectionVal: Hashable & CustomStringConvertible>(_ titleKey: LocalizedStringKey, selection: Binding<SelectionValue>, @ViewBuilder content: @escaping () -> Content) where Label == Text, SelectionVal == SelectionValue {
         self.selection = SelectionBinding.single(selection)
         self.content = content
         self.label = Text(titleKey)
