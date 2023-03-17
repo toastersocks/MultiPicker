@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "helpers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/toastersocks/Helpers",
+      "state" : {
+        "revision" : "4f78bff12585a1b2b19a631d7d80123a7e2978ce",
+        "version" : "0.2.0"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -13,7 +13,7 @@ let package = Package(
             targets: ["MultiPicker"]),
     ],
     dependencies: [
-        .package(path: "../Helpers"),
+        .package(url: "https://github.com/toastersocks/Helpers", from: "0.0.0"),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
