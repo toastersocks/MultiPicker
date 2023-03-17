@@ -1,7 +1,7 @@
 # MultiPicker
 
-[![po](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPickerb%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/toastersocks/MultiPicker)
-[![po](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPicker%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/toastersocks/MultiPicker)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPicker%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/toastersocks/MultiPicker)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPicker%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/toastersocks/MultiPicker)
 
 ---
 
@@ -51,7 +51,7 @@ struct MyView: View {
 }
 ```
 
-Check the [documentation](https://swiftpackageindex.com/toastersocks/MultiPicker/v1.0.0/documentation/multipicker) for more in-depth usage.
+Check the [documentation](https://swiftpackageindex.com/toastersocks/MultiPicker/v1.0.1/documentation/multipicker) for more in-depth usage.
 
 ## Installing
 
