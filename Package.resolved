@@ -3,10 +3,10 @@
     {
       "identity" : "helpers",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/toastersocks/Helpers",
+      "location" : "https://github.com/toastersocks/Helpers.git",
       "state" : {
-        "revision" : "4f78bff12585a1b2b19a631d7d80123a7e2978ce",
-        "version" : "0.2.0"
+        "revision" : "3005bafcbcc702361c5d0e1ef0a330642aa13301",
+        "version" : "0.4.0"
       }
     }
   ],
