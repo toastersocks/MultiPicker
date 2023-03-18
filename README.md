@@ -13,16 +13,16 @@ SwiftUI's `Picker` on iOS only allows choosing exactly one option. If you need a
 ![Navigation link style, rich choice style, dark mode, English](img/nav-rich-dark-en.png)
 ![Navigation link style, rich choice style, dark mode, Portuguese](img/nav-plain-dark-pt.png)
 ![Navigation link style, rich choice style, dark mode, Arabic](img/nav-rich-dark-ar.png)
-![Navigation link style, rich choice style, dark mode](img/nav-rich-dark-en.png)
 ![Inline style, leading and trailing selection indicator, light mode, English](img/list-light-leading-trailing-en.png)
 ![Inline style, leading and trailing selection indicator, dark mode, Arabic](img/list-dark-leading-trailing-ar.png)
 
 MultiPicker tries to make its API as close to the SwiftUI `Picker`'s as possible.
 
 MultiPicker supports localization and accessibility and has better default accessibility than `Picker`.
+MultiPicker supports string initializers as well as custom label views.
 MultiPicker has a few additions and deviations from `Picker`:
 
-- Supports putting the selection indicator (checkmark) on either the leading or trailing side of the option via the `selectionIndicatorPosition(_:)` modifier.
+- Supports putting the selection indicator (checkmark) on either the leading or trailing side of options via the `selectionIndicatorPosition(_:)` modifier.
 - Currently only supports inline and navigationLink style pickers.
 - The picker style is set using the `mpPickerStyle(_:)` instead of `pickerStyle(_:)` modifier.
 - Views are tagged using the `mpTag(_:)` modifier instead of `tag(_:)`
