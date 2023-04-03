@@ -105,6 +105,7 @@ struct ContainerSizeKey: PreferenceKey {
     }
 }
 
+#if DEBUG
 struct SwiftUIView_Previews: PreviewProvider {
     static var items = [
         Model(title: String(localized: "Red"), color: .red),
@@ -125,3 +126,4 @@ struct SwiftUIView_Previews: PreviewProvider {
         }
     }
 }
+#endif
