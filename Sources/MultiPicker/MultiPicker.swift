@@ -331,7 +331,9 @@ struct MultiPicker_Previews: PreviewProvider {
     static var previews: some View {
         multiPickerListPreview()
             .previewDisplayName("List Style")
-        multiPickerPreview()
+        NavigationView {
+            multiPickerPreview()
+        }
             .previewDisplayName("Navigation Link Style")
     }
 
