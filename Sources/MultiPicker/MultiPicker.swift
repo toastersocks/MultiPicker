@@ -364,6 +364,8 @@ struct MultiPicker_Previews: PreviewProvider {
             multiPickerPreview()
         }
             .previewDisplayName("Navigation Link Style")
+        modalMultiPickerPreview()
+            .previewDisplayName("Modal Style")
     }
 
     static func multiPickerListPreview() -> some View {
@@ -441,6 +443,45 @@ struct MultiPicker_Previews: PreviewProvider {
                     }
                 }
                 .mpPickerStyle(.navigationLink)
+            }
+        }
+    }
+
+    static func modalMultiPickerPreview() -> some View {
+        PreviewBindingHelper4(values: (["1", "2", "3"], "1", Optional<String>("1"), Set(arrayLiteral: "1") as Set<String>)) { (choices: Binding<[String]>, oneSelection: Binding<String>, oneOrNoneSelection: Binding<String?>, multiSelection: Binding<Set<String>>) in
+            Form {
+                Section("SwiftUI") {
+                    Picker("Only One", selection: oneSelection) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .tag($0)
+                        }
+                    }
+                }
+                #if !os(macOS)
+//                .pickerStyle(.navigationLink)
+                #endif
+                Section("MultiPicker") {
+                    MultiPicker("Only One", selection: oneSelection) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
+                    }
+                    MultiPicker("Multi", selection: multiSelection as Binding<Set<String>>) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
+                    }
+                    MultiPicker("One or None", selection: oneOrNoneSelection) {
+                        ForEach(choices.wrappedValue, id: \.self) {
+                            Text("\($0)")
+                                .mpTag($0)
+                        }
+                    }
+                }
+                .mpPickerStyle(.modal)
             }
         }
     }
