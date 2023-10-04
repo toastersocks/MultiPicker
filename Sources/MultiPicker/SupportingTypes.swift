@@ -23,6 +23,8 @@ public enum MultiPickerStyle {
     case navigationLink
     /// The picker displays a list style picker view inline with other views.
     case inline
+    /// The picker displays as a modal sheet.
+    case modal
 }
 
 /// The display style of the chosen options. This only affects multi pickers with ``MultiPickerStyle/navigationLink`` style.

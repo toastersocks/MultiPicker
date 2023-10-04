@@ -20,6 +20,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     @Environment(\.mpPickerStyle) var pickerStyle
     @Environment(\.selectionIndicatorPosition) var selectionIndicatorPosition
     @Environment(\.choiceRepresentationStyle) var choiceRepresentationStyle
+    @State private var showModal: Bool = false
 
     public var body: some View {
         switch pickerStyle {
@@ -44,6 +45,34 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
                 }
             }
             .accessibilityValue(Text(text(forValue: selection)))
+        case .modal:
+            HStack {
+                label
+                    .layoutPriority(0.5)
+                Button {
+                    showModal.toggle()
+                } label: {
+                    selectedOptions()
+                        .accessibilityHidden(true)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .sheet(isPresented: $showModal) {
+                NavigationView {
+                    MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
+                        .toolbar {
+                            ToolbarItem(placement: .principal) {
+                                label
+                                    .backport.bold()
+                            }
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button(String(localized: "Done")) {
+                                    showModal.toggle()
+                                }
+                            }
+                        }
+                }
+            }
         }
     }
 
