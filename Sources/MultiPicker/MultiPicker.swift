@@ -78,11 +78,11 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     private func text(forValue: SelectionBinding<SelectionValue>) -> String {
         switch selection {
         case .single(let binding):
-            return String(describing: binding.wrappedValue)
+            String(describing: binding.wrappedValue)
         case .oneOrNone(let binding):
-            return "\(binding.wrappedValue.map { "\($0)" } ?? "\(noneText)")"
+            "\(binding.wrappedValue.map { "\($0)" } ?? "\(noneText)")"
         case .multiple(let binding):
-            return binding.wrappedValue.map(String.init(describing:)).formatted(.list(type: .and))
+            binding.wrappedValue.map(String.init(describing:)).formatted(.list(type: .and))
         }
     }
 
@@ -205,22 +205,22 @@ fileprivate enum SelectionBinding<SelectionValue: Hashable>: Equatable {
     var isNone: Bool {
         switch self {
         case .oneOrNone(let binding) where binding.wrappedValue == nil:
-            return true
+            true
         case .multiple(let binding) where binding.wrappedValue.isEmpty:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 
     func isSelected(_ bound: SelectionValue) -> Bool {
         switch self {
         case let .single(binding):
-            return bound == binding.wrappedValue
+            bound == binding.wrappedValue
         case let .oneOrNone(binding):
-            return bound == binding.wrappedValue
+            bound == binding.wrappedValue
         case let .multiple(binding):
-            return binding.wrappedValue.contains(bound)
+            binding.wrappedValue.contains(bound)
         }
     }
 
