@@ -1,5 +1,6 @@
 import SwiftUI
 import Helpers
+import Flow
 
 #if os(macOS)
 #error("macOS not currently supported")
@@ -35,12 +36,11 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
                         }
                     }
             } label: {
-                HStack {
-                    label
-                        .layoutPriority(0.5)
+                LabeledContent {
                     selectedOptions()
                         .accessibilityHidden(true)
-                        .foregroundColor(.secondary)
+                } label: {
+                    label
                 }
             }
             .accessibilityValue(Text(text(forValue: selection)))
@@ -51,15 +51,12 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
         Group {
             switch choiceRepresentationStyle {
             case .plainText:
-                Spacer()
                 Text(text(forValue: selection))
             case .rich:
                 if selection.isNone {
-                    Spacer()
                     Text(noneText)
                 } else {
-                    Spacer()
-                    Flow {
+                    Flow(alignment: .topTrailing) {
                         content().childViews { children in
                             ForEach(children) { child in
                                 if let tag = child[MPTag.self].flatMap({

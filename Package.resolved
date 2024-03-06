@@ -1,12 +1,21 @@
 {
   "pins" : [
     {
+      "identity" : "flow",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/toastersocks/Flow.git",
+      "state" : {
+        "revision" : "5c1b99acf390ace87006e065b14f9bdcdd27fdbb",
+        "version" : "1.2.3"
+      }
+    },
+    {
       "identity" : "helpers",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/toastersocks/Helpers.git",
       "state" : {
-        "revision" : "3005bafcbcc702361c5d0e1ef0a330642aa13301",
-        "version" : "0.4.0"
+        "revision" : "ae8fe3d43f72082cd4a67a0e9791fa982aa90d54",
+        "version" : "0.6.0"
       }
     }
   ],
