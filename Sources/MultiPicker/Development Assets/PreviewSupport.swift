@@ -31,16 +31,13 @@ struct ModelCell: View {
     var body: some View {
         HStack {
             RoundedRectangle(cornerRadius: 3)
-            //            model.color
                 .fill(model.color)
-            //            Image(systemName: "square.fill")
-            //                .foregroundColor(model.color)
                 .aspectRatio(1, contentMode: .fill)
-
                 .fixedSize(horizontal: true, vertical: false)
                 .padding(.vertical, 6)
             Text(model.title)
         }
+        .frame(height: 31)
     }
 }
 #endif
