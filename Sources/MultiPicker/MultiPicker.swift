@@ -17,9 +17,9 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringCo
     @ViewBuilder private var content: () -> Content
     private var label: Label
     private var noneText = String(localized: "(None)")
-    @Environment(\.mpPickerStyle) var pickerStyle
-    @Environment(\.selectionIndicatorPosition) var selectionIndicatorPosition
-    @Environment(\.choiceRepresentationStyle) var choiceRepresentationStyle
+    @Environment(\.mpPickerStyle) private var pickerStyle
+    @Environment(\.selectionIndicatorPosition) private var selectionIndicatorPosition
+    @Environment(\.choiceRepresentationStyle) private var choiceRepresentationStyle
 
     public var body: some View {
         switch pickerStyle {
