@@ -331,10 +331,12 @@ struct MultiPicker_Previews: PreviewProvider {
     static var previews: some View {
         multiPickerListPreview()
             .previewDisplayName("List Style")
-        NavigationView {
-            multiPickerPreview()
-        }
-            .previewDisplayName("Navigation Link Style")
+
+        multiPickerNavigationLinkPreview()
+            .previewDisplayName("Navigation Link Style Plain Style Choice")
+
+        multiPickerNavigationLinkRichChoicePreview()
+            .previewDisplayName("Navigation Link Style Rich Style Choice")
     }
 
     static func multiPickerListPreview() -> some View {
@@ -377,41 +379,104 @@ struct MultiPicker_Previews: PreviewProvider {
         }
     }
 
-    static func multiPickerPreview() -> some View {
-        PreviewBindingHelper4(values: (["1", "2", "3"], "1", Optional<String>("1"), Set(arrayLiteral: "1") as Set<String>)) { (choices: Binding<[String]>, oneSelection: Binding<String>, oneOrNoneSelection: Binding<String?>, multiSelection: Binding<Set<String>>) in
-            Form {
-                Section("SwiftUI") {
-                    Picker("Only One", selection: oneSelection) {
-                        ForEach(choices.wrappedValue, id: \.self) {
-                            Text("\($0)")
-                                .tag($0)
+    static func multiPickerNavigationLinkPreview() -> some View {
+        NavigationStack {
+            PreviewBindingHelper4(values: (["1", "2", "3"], "1", Optional<String>("1"), Set(arrayLiteral: "1") as Set<String>)) { (choices: Binding<[String]>, oneSelection: Binding<String>, oneOrNoneSelection: Binding<String?>, multiSelection: Binding<Set<String>>) in
+                Form {
+                    Section("SwiftUI") {
+                        Picker("Only One", selection: oneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                Text("\($0)")
+                                    .tag($0)
+                            }
                         }
                     }
+                    #if !os(macOS)
+                    //                .pickerStyle(.navigationLink)
+                    #endif
+                    Section("MultiPicker") {
+                        MultiPicker("Only One", selection: oneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                Text("\($0)")
+                                    .mpTag($0)
+                            }
+                        }
+                        MultiPicker("Multi", selection: multiSelection as Binding<Set<String>>) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                Text("\($0)")
+                                    .mpTag($0)
+                            }
+                        }
+                        MultiPicker("One or None", selection: oneOrNoneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                Text("\($0)")
+                                    .mpTag($0)
+                            }
+                        }
+                    }
+                    .mpPickerStyle(.navigationLink)
                 }
-                #if !os(macOS)
-//                .pickerStyle(.navigationLink)
-                #endif
-                Section("MultiPicker") {
-                    MultiPicker("Only One", selection: oneSelection) {
-                        ForEach(choices.wrappedValue, id: \.self) {
-                            Text("\($0)")
-                                .mpTag($0)
+            }
+        }
+    }
+
+    static func multiPickerNavigationLinkRichChoicePreview() -> some View {
+        NavigationStack {
+            PreviewBindingHelper4(
+                values: (
+                    [
+                        Model(title: String(localized: "Red"), color: .red),
+                        Model(title: String(localized: "Orange"), color: .orange),
+                        Model(title: String(localized: "Yellow"), color: .yellow),
+                        Model(title: String(localized: "Green"), color: .green),
+                        Model(title: String(localized: "Blue"), color: .blue),
+                        Model(title: String(localized: "Indigo"), color: .indigo),
+                        Model(title: String(localized: "Violet"), color: .purple),
+                    ],
+                    Model(title: String(localized: "Red"), color: .red),
+                    Optional(Model(title: String(localized: "Red"), color: .red)),
+                    Set(arrayLiteral: Model(title: String(localized: "Red"), color: .red)) as Set<Model>
+                )
+            ) { (choices: Binding<[Model]>,
+                 oneSelection: Binding<Model>,
+                 oneOrNoneSelection: Binding<Model?>,
+                 multiSelection: Binding<Set<Model>>) in
+                Form {
+                    Section("SwiftUI") {
+                        Picker("Only One", selection: oneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .tag($0)
+                            }
                         }
                     }
-                    MultiPicker("Multi", selection: multiSelection as Binding<Set<String>>) {
-                        ForEach(choices.wrappedValue, id: \.self) {
-                            Text("\($0)")
-                                .mpTag($0)
+                    .pickerStyle(.navigationLink)
+                    #if !os(macOS)
+                    //                .pickerStyle(.navigationLink)
+                    #endif
+                    Section("MultiPicker") {
+                        MultiPicker("Only One", selection: oneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .mpTag($0)
+                            }
+                        }
+                        MultiPicker("Multi", selection: multiSelection as Binding<Set<Model>>) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .mpTag($0)
+                            }
+                        }
+                        MultiPicker("One or None", selection: oneOrNoneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .mpTag($0)
+                            }
                         }
                     }
-                    MultiPicker("One or None", selection: oneOrNoneSelection) {
-                        ForEach(choices.wrappedValue, id: \.self) {
-                            Text("\($0)")
-                                .mpTag($0)
-                        }
-                    }
+                    .mpPickerStyle(.navigationLink)
+                    .choiceRepresentationStyle(.rich)
                 }
-                .mpPickerStyle(.navigationLink)
             }
         }
     }
