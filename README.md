@@ -3,7 +3,7 @@
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPicker%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/toastersocks/MultiPicker)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Ftoastersocks%2FMultiPicker%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/toastersocks/MultiPicker)
 
-![](https://img.shields.io/badge/iOS-15+-blue)
+![](https://img.shields.io/badge/iOS-16+-blue)
 ![](https://img.shields.io/badge/visionOS-17+-blue)
 
 ---
