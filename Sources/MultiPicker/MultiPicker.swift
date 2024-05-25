@@ -9,7 +9,7 @@ import Flow
 /// A picker for selecting from multiple options.
 ///
 /// A MultiPicker can be initialized with several configurations, depending on what kind of binding is passed into the initializer. It can be configured to select between...
-/// - one of any number of mutually-exclusive options by passing in a binding to a non-optional value.
+/// - one of any number of mutually-exclusive options by passing in a binding to a non-optional value. This matches the behavior of ``SwiftUI.Picker``.
 /// - one or zero of any number of mutually-exclusive options by passing in a binding to an optional value.
 /// - one, zero, or many of any number of options by passing in a binding to a set of option values.
 public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>: View {

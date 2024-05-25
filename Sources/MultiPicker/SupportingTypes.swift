@@ -27,9 +27,9 @@ public enum MultiPickerStyle {
 
 /// The display style of the chosen options. This only affects multi pickers with ``MultiPickerStyle/navigationLink`` style.
 ///
-/// ``rich`` representation style might not look good depending on the complexity and/or size of the content views passed into multi picker. ``plainText`` style uses the `CustomStringConvertible.description` property of the tags to display the choice(s).
+/// ``rich`` representation style might not look good depending on the complexity and/or size of the content views passed into multi picker. If you need to customize the ``plainText`` representation of your choices, conform your choice models to  ``CustomStringConvertible`` and return your text representation in the ``CustomStringConvertible.description`` property of the tags..
 public enum ChoiceRepresentationStyle {
-    /// The picker displays a text representation of the chosen choice(s). This is the default. The `CustomStringConvertible` representation of the options' tag is used.
+    /// The picker displays a plain text representation of the chosen choice(s). This is the default. To customize how the choices are represented, conform your type to `CustomStringConvertible`, and return the appropriate text representation from it's `description` property.
     case plainText
     /// The picker will display the view(s) of the selected choice(s).
     case rich
