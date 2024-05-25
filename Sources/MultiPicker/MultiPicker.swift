@@ -12,7 +12,7 @@ import Flow
 /// - one of any number of mutually-exclusive options by passing in a binding to a non-optional value.
 /// - one or zero of any number of mutually-exclusive options by passing in a binding to an optional value.
 /// - one, zero, or many of any number of options by passing in a binding to a set of option values.
-public struct MultiPicker<Label: View, SelectionValue: Hashable & CustomStringConvertible, Content: View>: View {
+public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>: View {
 
     private var selection: SelectionBinding<SelectionValue>
     @ViewBuilder private var content: () -> Content
