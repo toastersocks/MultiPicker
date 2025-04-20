@@ -30,10 +30,18 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>:
             NavigationLink {
                 MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
                     .toolbar {
+                        #if os(watchOS)
+                        ToolbarItem(placement: .primaryAction) {
+                            label
+                                .backport.bold()
+                        }
+                        #else
                         ToolbarItem(placement: .principal) {
                             label
                                 .backport.bold()
                         }
+                        #endif
+                        
                     }
             } label: {
                 LabeledContent {
