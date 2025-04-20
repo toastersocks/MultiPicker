@@ -5,6 +5,7 @@
 
 ![](https://img.shields.io/badge/iOS-16+-blue)
 ![](https://img.shields.io/badge/visionOS-17+-blue)
+![](https://img.shields.io/badge/watchOS-9+-blue)
 
 ---
 
