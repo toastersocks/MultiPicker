@@ -52,26 +52,38 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>:
         }
     }
 
+    @ViewBuilder
+    func richSelectionRepresentation() -> some View {
+        if selection.isNone {
+            Text(noneText)
+        } else {
+            Flow(alignment: .topTrailing) {
+                content().childViews { children in
+                    ForEach(children) { child in
+                        if let tag = child[MPTag.self].flatMap({
+                            $0 as? SelectionValue
+                        }), selection.isSelected(tag) {
+                            child
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
     func selectedOptions() -> some View {
         Group {
             switch choiceRepresentationStyle {
             case .plainText:
                 Text(text(forValue: selection))
             case .rich:
-                if selection.isNone {
-                    Text(noneText)
+                richSelectionRepresentation()
+            case let .custom(viewProvider):
+                if let representation = viewProvider() {
+                    AnyView(representation)
                 } else {
-                    Flow(alignment: .topTrailing) {
-                        content().childViews { children in
-                            ForEach(children) { child in
-                                if let tag = child[MPTag.self].flatMap({
-                                    $0 as? SelectionValue
-                                }), selection.isSelected(tag) {
-                                    child
-                                }
-                            }
-                        }
-                    }
+                    richSelectionRepresentation()
                 }
             }
         }
@@ -339,6 +351,9 @@ struct MultiPicker_Previews: PreviewProvider {
 
         multiPickerNavigationLinkRichChoicePreview()
             .previewDisplayName("Navigation Link Style Rich Style Choice")
+
+        multiPickerNavigationLinkCustomChoicePreview()
+            .previewDisplayName("Navigation Link Style Custom Style Choice")
     }
 
     static func multiPickerListPreview() -> some View {
@@ -469,6 +484,89 @@ struct MultiPicker_Previews: PreviewProvider {
                                     .mpTag($0)
                             }
                         }
+                        MultiPicker("One or None", selection: oneOrNoneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .mpTag($0)
+                            }
+                        }
+                    }
+                    .mpPickerStyle(.navigationLink)
+                    .choiceRepresentationStyle(.rich)
+                }
+            }
+        }
+    }
+
+    static func multiPickerNavigationLinkCustomChoicePreview() -> some View {
+        NavigationStack {
+            PreviewBindingHelper4(
+                values: (
+                    [
+                        Model(title: String(localized: "Red"), color: .red),
+                        Model(title: String(localized: "Orange"), color: .orange),
+                        Model(title: String(localized: "Yellow"), color: .yellow),
+                        Model(title: String(localized: "Green"), color: .green),
+                        Model(title: String(localized: "Blue"), color: .blue),
+                        Model(title: String(localized: "Indigo"), color: .indigo),
+                        Model(title: String(localized: "Violet"), color: .purple),
+                    ],
+                    Model(title: String(localized: "Red"), color: .red),
+                    Optional(Model(title: String(localized: "Red"), color: .red)),
+                    Set(arrayLiteral: Model(title: String(localized: "Red"), color: .red)) as Set<Model>
+                )
+            ) { (choices: Binding<[Model]>,
+                 oneSelection: Binding<Model>,
+                 oneOrNoneSelection: Binding<Model?>,
+                 multiSelection: Binding<Set<Model>>) in
+                Form {
+                    Section("SwiftUI") {
+                        Picker("Only One", selection: oneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .tag($0)
+                            }
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+#if !os(macOS)
+                    //                .pickerStyle(.navigationLink)
+#endif
+                    Section("MultiPicker") {
+                        MultiPicker("Only One", selection: oneSelection) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .mpTag($0)
+                            }
+                        }
+                        MultiPicker("Multi", selection: multiSelection as Binding<Set<Model>>) {
+                            ForEach(choices.wrappedValue, id: \.self) {
+                                ModelCell(model: $0)
+                                    .mpTag($0)
+                            }
+                        }
+                        .choiceRepresentationStyle(.custom {
+                            switch multiSelection.wrappedValue.count {
+                            case 0: Text("0️⃣")
+                            case 3: nil // We can return `nil` to use the default rich representation.
+                            case 1...:
+                                Flow(alignment: .topTrailing, spacing: 0) {
+                                    ForEach(Array(multiSelection.wrappedValue)) { model in
+                                        switch model.title {
+                                        case "Red": Text("🍓")
+                                        case "Orange": Text("🍊")
+                                        case "Yellow": Text("🍋")
+                                        case "Green": Text("🍐")
+                                        case "Blue": Text("💙")
+                                        case "Indigo": Text("🪻")
+                                        case "Violet": Text("🍇")
+                                        default: EmptyView()
+                                        }
+                                    }
+                                }
+                            default: nil
+                            }
+                        })
                         MultiPicker("One or None", selection: oneOrNoneSelection) {
                             ForEach(choices.wrappedValue, id: \.self) {
                                 ModelCell(model: $0)

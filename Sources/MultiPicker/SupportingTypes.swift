@@ -33,8 +33,9 @@ public enum ChoiceRepresentationStyle {
     case plainText
     /// The picker will display the view(s) of the selected choice(s).
     case rich
+    /// Provide a custom representation for the view selection(s). Return the desired representation, or `nil` to use the default representation.
+    case custom(_ content: () -> (any View)?)
 }
-
 
 public extension View {
     /// Use this view modifier to tag the views representing the picker's options and associate them with the selection values they represent.
