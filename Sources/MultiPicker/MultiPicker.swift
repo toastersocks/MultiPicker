@@ -31,17 +31,14 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>:
                 MultiPickerSelectionList<SelectionValue, Content>(selection: selection, indicatorPosition: selectionIndicatorPosition, content: content)
                     .toolbar {
                         #if os(watchOS)
-                        ToolbarItem(placement: .primaryAction) {
-                            label
-                                .backport.bold()
-                        }
+                        let toolbarPlacement: ToolbarItemPlacement = .primaryAction
                         #else
-                        ToolbarItem(placement: .principal) {
+                        let toolbarPlacement: ToolbarItemPlacement = .principal
+                        #endif
+                        ToolbarItem(placement: toolbarPlacement) {
                             label
                                 .backport.bold()
                         }
-                        #endif
-                        
                     }
             } label: {
                 LabeledContent {
