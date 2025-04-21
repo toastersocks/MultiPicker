@@ -7,7 +7,8 @@ let package = Package(
     name: "MultiPicker",
     platforms: [
         .iOS(.v16),
-        .macOS(.v13)
+        .macOS(.v13),
+        .watchOS(.v9)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
