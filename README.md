@@ -27,6 +27,7 @@ MultiPicker supports string initializers as well as custom label views.
 MultiPicker has a few additions and deviations from `Picker`:
 
 - Supports putting the selection indicator (checkmark) on either the leading or trailing side of options via the `selectionIndicatorPosition(_:)` modifier.
+- You can customize how the set of selected choices are represented in the `.navigationLink` style.
 - Currently only supports inline and navigationLink style pickers.
 - The picker style is set using the `mpPickerStyle(_:)` instead of `pickerStyle(_:)` modifier.
 - Views are tagged using the `mpTag(_:)` modifier instead of `tag(_:)`
