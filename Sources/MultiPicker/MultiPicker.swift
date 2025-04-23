@@ -548,9 +548,9 @@ struct MultiPicker_Previews: PreviewProvider {
                         .choiceRepresentationStyle(.custom {
                             switch multiSelection.wrappedValue.count {
                             case 0: Text("0️⃣")
-                            case 3: nil // We can return `nil` to use the default rich representation.
-                            case 1...:
-                                Flow(alignment: .topTrailing, spacing: 0) {
+                            case 1: nil // We can return `nil` to use the default rich representation.
+                            case 2...4:
+                                HStack {
                                     ForEach(Array(multiSelection.wrappedValue)) { model in
                                         switch model.title {
                                         case "Red": Text("🍓")
@@ -564,6 +564,8 @@ struct MultiPicker_Previews: PreviewProvider {
                                         }
                                     }
                                 }
+                            case 5...:
+                                Text("🌈")
                             default: nil
                             }
                         })

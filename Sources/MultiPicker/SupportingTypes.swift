@@ -27,13 +27,57 @@ public enum MultiPickerStyle {
 
 /// The display style of the chosen options. This only affects multi pickers with ``MultiPickerStyle/navigationLink`` style.
 ///
-/// ``rich`` representation style might not look good depending on the complexity and/or size of the content views passed into multi picker. If you need to customize the ``plainText`` representation of your choices, conform your choice models to  ``CustomStringConvertible`` and return your text representation in the ``CustomStringConvertible.description`` property of the tags..
+/// ``rich`` representation style might not look good depending on the complexity and/or size of the content views passed into multi picker. If you need to customize the ``plainText`` representation of your choices, conform your choice models to  ``CustomStringConvertible`` and return your text representation in the ``CustomStringConvertible.description`` property of the tags.
 public enum ChoiceRepresentationStyle {
     /// The picker displays a plain text representation of the chosen choice(s). This is the default. To customize how the choices are represented, conform your type to `CustomStringConvertible`, and return the appropriate text representation from it's `description` property.
     case plainText
+    
     /// The picker will display the view(s) of the selected choice(s).
     case rich
-    /// Provide a custom representation for the view selection(s). Return the desired representation, or `nil` to use the default representation.
+    
+    /// Provides a custom representation for the selected choice(s).
+    ///
+    /// Use this style when you want complete control over how selections are displayed in the navigation link.
+    /// The closure you provide should return either:
+    /// - A view that will be used to represent the current selection state
+    /// - `nil` to fallback to the default ``rich`` representation
+    ///
+    /// The closure is called whenever the selection changes, allowing you to provide different
+    /// representations based on the current selection state (e.g., empty selections, single selections,
+    /// or multiple selections).
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    ///
+    /// MultiPicker("Colors", selection: $selectedColors) {
+    ///     // Picker content...
+    /// }
+    /// .choiceRepresentationStyle(.custom {
+    ///     switch selectedColors.count {
+    ///     case 0: Text("0️⃣")
+    ///     case 1: nil // We can return `nil` to use the default rich representation.
+    ///     case 2...4:
+    ///         HStack {
+    ///             ForEach(Array(selectedColors)) { color in
+    ///                 switch color.title {
+    ///                 case "Red": Text("🍓")
+    ///                 case "Orange": Text("🍊")
+    ///                 case "Yellow": Text("🍋")
+    ///                 case "Green": Text("🍐")
+    ///                 case "Blue": Text("💙")
+    ///                 case "Indigo": Text("🪻")
+    ///                 case "Violet": Text("🍇")
+    ///                 default: EmptyView()
+    ///                 }
+    ///             }
+    ///         }
+    ///     case 5...:
+    ///         Text("🌈")
+    ///     default: nil
+    ///     }
+    /// })
+    /// ```
     case custom(_ content: () -> (any View)?)
 }
 
@@ -65,9 +109,39 @@ extension View {
 }
 
 extension View {
-    /// Sets the style of ``MultiPicker``s in the view.
-    /// - Parameter style: The desired style. Currently only inline and navigationLink are supported.
-    /// - Returns: A view with the multi picker style set.
+    /// Sets the representation style for selections in ``MultiPicker`` controls.
+    ///
+    /// This modifier affects how selections are displayed in the navigation link label when using
+    /// ``MultiPickerStyle/navigationLink`` style. It has no effect when using ``MultiPickerStyle/inline``.
+    ///
+    /// - Parameter style: The desired representation style:
+    ///   - ``ChoiceRepresentationStyle/plainText``: Displays the text description of selected values
+    ///   - ``ChoiceRepresentationStyle/rich``: Displays the actual views of selected values
+    ///   - ``ChoiceRepresentationStyle/custom``: Provides complete control over selection representation
+    ///
+    /// - Returns: A view with the choice representation style set.
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// Form {
+    ///     // Basic plain text representation (default)
+    ///     MultiPicker("Colors", selection: $selectedColors) { ... }
+    ///         .mpPickerStyle(.navigationLink)
+    ///
+    ///     // Rich representation showing the actual selection views
+    ///     MultiPicker("Colors", selection: $selectedColors) { ... }
+    ///         .mpPickerStyle(.navigationLink)
+    ///         .choiceRepresentationStyle(.rich)
+    ///
+    ///     // Custom representation with emoji indicators
+    ///     MultiPicker("Colors", selection: $selectedColors) { ... }
+    ///         .mpPickerStyle(.navigationLink)
+    ///         .choiceRepresentationStyle(.custom {
+    ///             // Custom representation logic here
+    ///         })
+    /// }
+    /// ```
     public func choiceRepresentationStyle(_ style: ChoiceRepresentationStyle) -> some View {
         environment(\.choiceRepresentationStyle, style)
     }
