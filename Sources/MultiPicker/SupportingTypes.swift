@@ -204,7 +204,7 @@ extension EnvironmentValues {
     }
 }
 
-extension Binding: Equatable where Value: Equatable {
+extension Binding: @retroactive Equatable where Value: Equatable {
     public static func == (lhs: Binding<Value>, rhs: Binding<Value>) -> Bool {
         lhs.wrappedValue == rhs.wrappedValue
     }
