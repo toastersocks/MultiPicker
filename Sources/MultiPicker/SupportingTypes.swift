@@ -84,7 +84,7 @@ public extension View {
     /// Use this view modifier to tag the views representing the picker's options and associate them with the selection values they represent.
     /// - Parameter value: A `Hashable` value representing the option. Use this to associate a selection value with the view that represents it.
     /// - Returns: A view tagged with the supplied `value`
-    func mpTag<Value: Hashable>(_ value: Value) -> some View {
+    func mpTag<Value: Hashable & Sendable>(_ value: Value) -> some View {
         _trait(MPTag.self, value)
     }
 }
@@ -116,7 +116,7 @@ extension View {
     /// - Parameter style: The desired representation style:
     ///   - ``ChoiceRepresentationStyle/plainText``: Displays the text description of selected values
     ///   - ``ChoiceRepresentationStyle/rich``: Displays the actual views of selected values
-    ///   - ``ChoiceRepresentationStyle/custom``: Provides complete control over selection representation
+    ///   - ``ChoiceRepresentationStyle/custom(_:)``: Provides complete control over selection representation
     ///
     /// - Returns: A view with the choice representation style set.
     ///
@@ -168,40 +168,19 @@ extension View {
 
 // MARK: - Internal API
 struct MPTag: _ViewTraitKey {
-    static var defaultValue: AnyHashable? = Int?.none
-}
-
-struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
-    static var defaultValue: MultiPickerStyle = .inline
+    static let defaultValue: (any Hashable & Sendable)? = Int?.none
 }
 
 extension EnvironmentValues {
-    var mpPickerStyle: MultiPickerStyle {
-        get { self[MultiPickerStyleEnvironmentKey.self] }
-        set { self[MultiPickerStyleEnvironmentKey.self] = newValue }
-    }
-}
-
-struct SelectionIndicatorPositionEnvironmentKey: EnvironmentKey {
-    static var defaultValue: SelectionIndicatorPosition = .trailing
+    @Entry var mpPickerStyle: MultiPickerStyle = .inline
 }
 
 extension EnvironmentValues {
-    var selectionIndicatorPosition: SelectionIndicatorPosition {
-        get { self[SelectionIndicatorPositionEnvironmentKey.self] }
-        set { self[SelectionIndicatorPositionEnvironmentKey.self] = newValue }
-    }
-}
-
-struct ChoiceRepresentationStyleEnvironmentKey: EnvironmentKey {
-    static var defaultValue: ChoiceRepresentationStyle = .plainText
+    @Entry var selectionIndicatorPosition: SelectionIndicatorPosition = .trailing
 }
 
 extension EnvironmentValues {
-    var choiceRepresentationStyle: ChoiceRepresentationStyle {
-        get { self[ChoiceRepresentationStyleEnvironmentKey.self] }
-        set { self[ChoiceRepresentationStyleEnvironmentKey.self] = newValue }
-    }
+    @Entry var choiceRepresentationStyle: ChoiceRepresentationStyle = .plainText
 }
 
 extension Binding: @retroactive Equatable where Value: Equatable {
