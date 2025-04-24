@@ -27,7 +27,7 @@ public enum MultiPickerStyle {
 
 /// The display style of the chosen options. This only affects multi pickers with ``MultiPickerStyle/navigationLink`` style.
 ///
-/// ``rich`` representation style might not look good depending on the complexity and/or size of the content views passed into multi picker. If you need to customize the ``plainText`` representation of your choices, conform your choice models to  ``CustomStringConvertible`` and return your text representation in the ``CustomStringConvertible.description`` property of the tags.
+/// ``rich`` representation style might not look good depending on the complexity and/or size of the content views passed into multi picker. If you need to customize the ``plainText`` representation of your choices, conform your choice models to  ``CustomStringConvertible`` and return your text representation in the ``CustomStringConvertible.description`` property of the tags. If you need complete control over the representation of the set of selected choices, use ``custom(_:)`` to return a suitable view. Return `nil` to use the ``rich`` representation.
 public enum ChoiceRepresentationStyle {
     /// The picker displays a plain text representation of the chosen choice(s). This is the default. To customize how the choices are represented, conform your type to `CustomStringConvertible`, and return the appropriate text representation from it's `description` property.
     case plainText
@@ -40,11 +40,10 @@ public enum ChoiceRepresentationStyle {
     /// Use this style when you want complete control over how selections are displayed in the navigation link.
     /// The closure you provide should return either:
     /// - A view that will be used to represent the current selection state
-    /// - `nil` to fallback to the default ``rich`` representation
+    /// - Return `nil` to use the ``rich`` representation. This allows customization of only the specific cases needed, for instance the case where no options are selected could be customized, but all other cases could use the default ``rich`` representation.
     ///
     /// The closure is called whenever the selection changes, allowing you to provide different
-    /// representations based on the current selection state (e.g., empty selections, single selections,
-    /// or multiple selections).
+    /// representations based on the current selection state.
     ///
     /// ## Example
     ///
@@ -134,13 +133,33 @@ extension View {
     ///         .mpPickerStyle(.navigationLink)
     ///         .choiceRepresentationStyle(.rich)
     ///
-    ///     // Custom representation with emoji indicators
+    ///     // Custom representation
     ///     MultiPicker("Colors", selection: $selectedColors) { ... }
     ///         .mpPickerStyle(.navigationLink)
-    ///         .choiceRepresentationStyle(.custom {
-    ///             // Custom representation logic here
-    ///         })
-    /// }
+    /// .choiceRepresentationStyle(.custom {
+    ///     switch selectedColors.count {
+    ///     case 0: Text("0️⃣")
+    ///     case 1: nil // We can return `nil` to use the default rich representation.
+    ///     case 2...4:
+    ///         HStack {
+    ///             ForEach(Array(selectedColors)) { color in
+    ///                 switch color.title {
+    ///                 case "Red": Text("🍓")
+    ///                 case "Orange": Text("🍊")
+    ///                 case "Yellow": Text("🍋")
+    ///                 case "Green": Text("🍐")
+    ///                 case "Blue": Text("💙")
+    ///                 case "Indigo": Text("🪻")
+    ///                 case "Violet": Text("🍇")
+    ///                 default: EmptyView()
+    ///                 }
+    ///             }
+    ///         }
+    ///     case 5...:
+    ///         Text("🌈")
+    ///     default: nil
+    ///     }
+    /// })
     /// ```
     public func choiceRepresentationStyle(_ style: ChoiceRepresentationStyle) -> some View {
         environment(\.choiceRepresentationStyle, style)
