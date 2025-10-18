@@ -220,7 +220,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>:
     }
 }
 
-fileprivate enum SelectionBinding<SelectionValue: Hashable>: Equatable {
+enum SelectionBinding<SelectionValue: Hashable>: Equatable {
     case single(Binding<SelectionValue>)
     case oneOrNone(Binding<SelectionValue?>)
     case multiple(Binding<Set<SelectionValue>>)
