@@ -1,0 +1,42 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.destination }}
+    runs-on: macos-15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - destination: 'platform=iOS Simulator,name=iPhone 16'
+            name: iOS
+          - destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)'
+            name: watchOS
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build and Test
+        run: |
+          xcodebuild test \
+            -scheme MultiPicker \
+            -destination '${{ matrix.destination }}' \
+            -enableCodeCoverage YES
+
+      - name: Upload coverage reports to Codecov
+        if: matrix.name == 'iOS'
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
