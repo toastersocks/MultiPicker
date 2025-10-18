@@ -84,8 +84,13 @@ public extension View {
     /// Use this view modifier to tag the views representing the picker's options and associate them with the selection values they represent.
     /// - Parameter value: A `Hashable` value representing the option. Use this to associate a selection value with the view that represents it.
     /// - Returns: A view tagged with the supplied `value`
+    @ViewBuilder
     func mpTag<Value: Hashable & Sendable>(_ value: Value) -> some View {
-        _trait(MPTag.self, value)
+        if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+            self.containerValue(\.mpTag, value as (any Hashable & Sendable)?)
+        } else {
+            self._trait(MPTag.self, value)
+        }
     }
 }
 
@@ -167,6 +172,12 @@ extension View {
 }
 
 // MARK: - Internal API
+
+@available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *)
+extension ContainerValues {
+    @Entry var mpTag: (any Hashable & Sendable)? = Int?.none
+}
+
 struct MPTag: _ViewTraitKey {
     static let defaultValue: (any Hashable & Sendable)? = Int?.none
 }

@@ -58,12 +58,22 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>:
             Text(noneText)
         } else {
             Flow(alignment: .topTrailing) {
-                content().childViews { children in
-                    ForEach(children) { child in
-                        if let tag = child[MPTag.self].flatMap({
+                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+                    ForEach(subviews: content()) { child in
+                        if let tag = child.containerValues.mpTag.flatMap({
                             $0 as? SelectionValue
                         }), selection.isSelected(tag) {
                             child
+                        }
+                    }
+                } else {
+                    content().childViews { children in
+                        ForEach(children) { child in
+                            if let tag = child[MPTag.self].flatMap({
+                                $0 as? SelectionValue
+                            }), selection.isSelected(tag) {
+                                child
+                            }
                         }
                     }
                 }
@@ -96,7 +106,7 @@ public struct MultiPicker<Label: View, SelectionValue: Hashable, Content: View>:
         case .oneOrNone(let binding):
             "\(binding.wrappedValue.map { "\($0)" } ?? "\(noneText)")"
         case .multiple(let binding):
-            binding.wrappedValue.map(String.init(describing:)).formatted(.list(type: .and))
+            binding.wrappedValue.map { String(describing: $0) }.formatted(.list(type: .and))
         }
     }
 
@@ -265,9 +275,9 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
 
     var body: some View {
         List {
-            content.childViews { children in
-                ForEach(children) { child in
-                    let tag = child[MPTag.self].flatMap {
+            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+                ForEach(subviews: content) { child in
+                    let tag = child.containerValues.mpTag.flatMap {
                         $0 as? SelectionValue
                     }
                     let paddedChild = child.padding(.vertical, 4)
@@ -293,6 +303,38 @@ fileprivate struct MultiPickerSelectionList<SelectionValue: Hashable, Content: V
                     )
                     .onTapGesture {
                         tag.map { selection.select($0) }
+                    }
+                }
+            } else {
+                content.childViews { children in
+                    ForEach(children) { child in
+                        let tag = child[MPTag.self].flatMap {
+                            $0 as? SelectionValue
+                        }
+                        let paddedChild = child.padding(.vertical, 4)
+                        HStack(spacing: 4) {
+                            if selectionIndicatorPosition == .trailing {
+                                paddedChild
+                                    .padding(.horizontal)
+                                Spacer()
+                            }
+                            checkmark(tag: tag)
+                            if selectionIndicatorPosition == .leading {
+                                paddedChild
+                                Spacer()
+                            }
+                        }
+                        .listRowInsets(EdgeInsets(top: 0, leading: 4, bottom: 0, trailing: 0))
+                        .contentShape(Rectangle())
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityValue(
+                            tag.map {
+                                Text(selection.isSelected($0) ? "Selected" : "")
+                            } ?? Text("")
+                        )
+                        .onTapGesture {
+                            tag.map { selection.select($0) }
+                        }
                     }
                 }
             }
