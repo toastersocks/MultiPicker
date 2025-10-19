@@ -1,4 +1,5 @@
 {
+  "originHash" : "e5515beeee583116ed7e962bce88a6fd2be4caa425fb57d448ce4bd02012596c",
   "pins" : [
     {
       "identity" : "flow",
@@ -14,10 +15,10 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/toastersocks/Helpers.git",
       "state" : {
-        "revision" : "cc32e570cc0b2b45bdd6ac88f089a3755f46770c",
-        "version" : "0.7.0"
+        "revision" : "52df24e5a65767dc9bc50b2a0cd1f53fb9203ff8",
+        "version" : "1.0.0"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

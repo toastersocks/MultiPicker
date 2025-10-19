@@ -182,6 +182,20 @@ struct MPTag: _ViewTraitKey {
     static let defaultValue: (any Hashable & Sendable)? = Int?.none
 }
 
+import Helpers
+
+#if compiler(>=6.0)
+extension Backport.Subview {
+    var mpTagValue: (any Hashable & Sendable)? {
+        if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
+            containerValues.mpTag
+        } else {
+            self[MPTag.self]
+        }
+    }
+}
+#endif
+
 #if swift(>=6.0)
 extension EnvironmentValues {
     @Entry var mpPickerStyle: MultiPickerStyle = .inline
