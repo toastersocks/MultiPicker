@@ -184,7 +184,6 @@ struct MPTag: _ViewTraitKey {
 
 import Helpers
 
-#if compiler(>=6.0)
 extension Backport.Subview {
     var mpTagValue: (any Hashable & Sendable)? {
         if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
@@ -194,9 +193,7 @@ extension Backport.Subview {
         }
     }
 }
-#endif
 
-#if swift(>=6.0)
 extension EnvironmentValues {
     @Entry var mpPickerStyle: MultiPickerStyle = .inline
     @Entry var selectionIndicatorPosition: SelectionIndicatorPosition = .trailing
@@ -208,39 +205,4 @@ extension Binding: @retroactive Equatable where Value: Equatable {
         lhs.wrappedValue == rhs.wrappedValue
     }
 }
-#else
-struct MultiPickerStyleEnvironmentKey: EnvironmentKey {
-    static var defaultValue: MultiPickerStyle = .inline
-}
 
-struct SelectionIndicatorPositionEnvironmentKey: EnvironmentKey {
-    static var defaultValue: SelectionIndicatorPosition = .trailing
-}
-
-struct ChoiceRepresentationStyleEnvironmentKey: EnvironmentKey {
-    static var defaultValue: ChoiceRepresentationStyle = .plainText
-}
-
-extension EnvironmentValues {
-    var mpPickerStyle: MultiPickerStyle {
-        get { self[MultiPickerStyleEnvironmentKey.self] }
-        set { self[MultiPickerStyleEnvironmentKey.self] = newValue }
-    }
-
-    var selectionIndicatorPosition: SelectionIndicatorPosition {
-        get { self[SelectionIndicatorPositionEnvironmentKey.self] }
-        set { self[SelectionIndicatorPositionEnvironmentKey.self] = newValue }
-    }
-
-    var choiceRepresentationStyle: ChoiceRepresentationStyle {
-        get { self[ChoiceRepresentationStyleEnvironmentKey.self] }
-        set { self[ChoiceRepresentationStyleEnvironmentKey.self] = newValue }
-    }
-}
-
-extension Binding: Equatable where Value: Equatable {
-    public static func == (lhs: Binding<Value>, rhs: Binding<Value>) -> Bool {
-        lhs.wrappedValue == rhs.wrappedValue
-    }
-}
-#endif
