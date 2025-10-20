@@ -8,34 +8,74 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.destination }}
+    name: ${{ matrix.xcode }} / ${{ matrix.platform }} / Swift ${{ matrix.swift-version }}
     runs-on: macos-15
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - destination: 'platform=iOS Simulator,name=iPhone 16'
-            name: iOS
-          - destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)'
-            name: watchOS
+          # Xcode 16 - Swift 6 language mode
+          - xcode: 'Xcode 16'
+            xcode-path: '/Applications/Xcode_16.4.app'
+            destination: 'platform=iOS Simulator,name=iPhone 16'
+            platform: iOS
+            swift-version: '6'
+          - xcode: 'Xcode 16'
+            xcode-path: '/Applications/Xcode_16.4.app'
+            destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)'
+            platform: watchOS
+            swift-version: '6'
+
+          # Xcode 16 - Swift 5 language mode
+          - xcode: 'Xcode 16'
+            xcode-path: '/Applications/Xcode_16.4.app'
+            destination: 'platform=iOS Simulator,name=iPhone 16'
+            platform: iOS
+            swift-version: '5'
+
+          # Xcode 26 - Swift 6 language mode
+          - xcode: 'Xcode 26'
+            xcode-path: '/Applications/Xcode_26.0.1.app'
+            destination: 'platform=iOS Simulator,name=iPhone 16'
+            platform: iOS
+            swift-version: '6'
+          - xcode: 'Xcode 26'
+            xcode-path: '/Applications/Xcode_26.0.1.app'
+            destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)'
+            platform: watchOS
+            swift-version: '6'
+
+          # Xcode 26 - Swift 5 language mode
+          - xcode: 'Xcode 26'
+            xcode-path: '/Applications/Xcode_26.0.1.app'
+            destination: 'platform=iOS Simulator,name=iPhone 16'
+            platform: iOS
+            swift-version: '5'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: sudo xcode-select -s ${{ matrix.xcode-path }}/Contents/Developer
+
       - name: Show Xcode version
         run: xcodebuild -version
+
+      - name: Show Swift version
+        run: swift --version
 
       - name: Build and Test
         run: |
           xcodebuild test \
             -scheme MultiPicker \
             -destination '${{ matrix.destination }}' \
-            -enableCodeCoverage YES
+            -enableCodeCoverage YES \
+            SWIFT_VERSION=${{ matrix.swift-version }}
 
       - name: Upload coverage reports to Codecov
-        if: matrix.name == 'iOS'
+        if: matrix.platform == 'iOS' && matrix.xcode == 'Xcode 16' && matrix.swift-version == '6'
         uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: false
