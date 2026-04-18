@@ -199,10 +199,3 @@ extension EnvironmentValues {
     @Entry var selectionIndicatorPosition: SelectionIndicatorPosition = .trailing
     @Entry var choiceRepresentationStyle: ChoiceRepresentationStyle = .plainText
 }
-
-extension Binding: @retroactive Equatable where Value: Equatable {
-    public static func == (lhs: Binding<Value>, rhs: Binding<Value>) -> Bool {
-        lhs.wrappedValue == rhs.wrappedValue
-    }
-}
-

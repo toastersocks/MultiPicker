@@ -217,6 +217,15 @@ enum SelectionBinding<SelectionValue: Hashable>: Equatable {
     case oneOrNone(Binding<SelectionValue?>)
     case multiple(Binding<Set<SelectionValue>>)
 
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.single(let l), .single(let r)): l.wrappedValue == r.wrappedValue
+        case (.oneOrNone(let l), .oneOrNone(let r)): l.wrappedValue == r.wrappedValue
+        case (.multiple(let l), .multiple(let r)): l.wrappedValue == r.wrappedValue
+        default: false
+        }
+    }
+
     var isNone: Bool {
         switch self {
         case .oneOrNone(let binding) where binding.wrappedValue == nil:
