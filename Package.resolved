@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/toastersocks/Helpers.git",
       "state" : {
-        "revision" : "05bbf887ec0b235c14be6d13de61a04fc65a1ddc",
-        "version" : "1.0.1"
+        "revision" : "97310bd427ec8928aea3efd5c93a692d704222d5",
+        "version" : "1.0.2"
       }
     }
   ],
