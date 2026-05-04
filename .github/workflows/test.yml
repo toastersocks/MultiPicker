@@ -9,38 +9,89 @@ on:
 jobs:
   test:
     name: ${{ matrix.xcode }} / ${{ matrix.platform }}
-    runs-on: macos-15
+    runs-on: ${{ matrix.runner }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
+          # Xcode 15 / pre-iOS 18
+          - xcode: 'Xcode 15'
+            xcode-version: '15.4'
+            runner: macos-14
+            xcode-path: '/Applications/Xcode_15.4.app'
+            platform: iOS
+            destination-platform: 'iOS Simulator'
+            runtime: 'iOS 17'
+            preferred-device: 'iPhone 15'
+          - xcode: 'Xcode 15'
+            xcode-version: '15.4'
+            runner: macos-14
+            xcode-path: '/Applications/Xcode_15.4.app'
+            platform: watchOS
+            destination-platform: 'watchOS Simulator'
+            runtime: 'watchOS 10'
+            preferred-device: 'Apple Watch Series 9 (41mm)'
+
           # Xcode 16
           - xcode: 'Xcode 16'
+            xcode-version: '16.4'
+            runner: macos-15
             xcode-path: '/Applications/Xcode_16.4.app'
-            destination: 'platform=iOS Simulator,name=iPhone 16'
             platform: iOS
+            destination-platform: 'iOS Simulator'
+            runtime: 'iOS 18'
+            preferred-device: 'iPhone 16'
           - xcode: 'Xcode 16'
+            xcode-version: '16.4'
+            runner: macos-15
             xcode-path: '/Applications/Xcode_16.4.app'
-            destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)'
             platform: watchOS
+            destination-platform: 'watchOS Simulator'
+            runtime: 'watchOS 11'
+            preferred-device: 'Apple Watch Series 10 (42mm)'
 
-          # Xcode 26
-          - xcode: 'Xcode 26'
-            xcode-path: '/Applications/Xcode_26.0.1.app'
-            destination: 'platform=iOS Simulator,name=iPhone 16'
+          # Xcode 26.4 / Swift 6.3
+          - xcode: 'Xcode 26.4'
+            xcode-version: '26.4'
+            runner: macos-26
+            xcode-path: '/Applications/Xcode_26.4.app'
             platform: iOS
-          - xcode: 'Xcode 26'
-            xcode-path: '/Applications/Xcode_26.0.1.app'
-            destination: 'platform=watchOS Simulator,name=Apple Watch Series 11 (42mm)'
+            destination-platform: 'iOS Simulator'
+            runtime: 'iOS 26.4'
+            preferred-device: 'iPhone 17'
+          - xcode: 'Xcode 26.4'
+            xcode-version: '26.4'
+            runner: macos-26
+            xcode-path: '/Applications/Xcode_26.4.app'
             platform: watchOS
+            destination-platform: 'watchOS Simulator'
+            runtime: 'watchOS 26.4'
+            preferred-device: 'Apple Watch Series 11 (42mm)'
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Select Xcode ${{ matrix.xcode }}
-        run: sudo xcode-select -s ${{ matrix.xcode-path }}/Contents/Developer
+        run: |
+          xcode_path='${{ matrix.xcode-path }}'
+          xcode_version='${{ matrix.xcode-version }}'
+
+          if [ -d "$xcode_path" ]; then
+            selected_xcode="$xcode_path"
+          else
+            selected_xcode="$(find /Applications -maxdepth 1 -name "Xcode_${xcode_version}*.app" ! -iname '*beta*' -print | sort | tail -n 1)"
+          fi
+
+          if [ -z "${selected_xcode:-}" ]; then
+            echo "No Xcode $xcode_version installation found."
+            ls -1 /Applications | grep '^Xcode' || true
+            exit 1
+          fi
+
+          echo "Using Xcode at $selected_xcode"
+          sudo xcode-select -s "$selected_xcode/Contents/Developer"
 
       - name: Show Xcode version
         run: xcodebuild -version
@@ -48,16 +99,79 @@ jobs:
       - name: Show Swift version
         run: swift --version
 
+      - name: Resolve simulator destination
+        id: destination
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          platform='${{ matrix.destination-platform }}'
+          runtime='${{ matrix.runtime }}'
+          preferred_device='${{ matrix.preferred-device }}'
+
+          xcrun simctl list devices available
+
+          device_info="$(xcrun simctl list devices available | awk -v runtime="$runtime" -v preferred_device="$preferred_device" '
+              index($0, "-- " runtime) == 1 {
+                in_runtime = 1
+                next
+              }
+
+              /^-- / {
+                in_runtime = 0
+              }
+
+              in_runtime && /\([[:xdigit:]-]+\) \((Booted|Shutdown)\)[[:space:]]*$/ {
+                entry = $0
+                sub(/[[:space:]]*\((Booted|Shutdown)\)[[:space:]]*$/, "", entry)
+
+                name = entry
+                sub(/^ +/, "", name)
+                sub(/[[:space:]]*\([[:xdigit:]-]+\)$/, "", name)
+
+                id = entry
+                sub(/^.* \(/, "", id)
+                sub(/\)$/, "", id)
+
+                if (name == preferred_device) {
+                  found = 1
+                  print name "\t" id
+                  exit
+                }
+
+                if (fallback == "") {
+                  fallback = name "\t" id
+                }
+              }
+
+              END {
+                if (!found && fallback != "") {
+                  print fallback
+                }
+              }
+            ')"
+
+          if [ -z "${device_info:-}" ]; then
+            echo "No available $runtime simulator device found."
+            exit 1
+          fi
+
+          IFS=$'\t' read -r device device_id <<< "$device_info"
+          destination="platform=$platform,id=$device_id"
+          echo "Using destination: $destination"
+          echo "Selected simulator: $device"
+          echo "value=$destination" >> "$GITHUB_OUTPUT"
+
       - name: Build and Test
         run: |
           xcodebuild test \
             -scheme MultiPicker \
-            -destination '${{ matrix.destination }}' \
+            -destination '${{ steps.destination.outputs.value }}' \
             -enableCodeCoverage YES
 
       - name: Upload coverage reports to Codecov
         if: matrix.platform == 'iOS' && matrix.xcode == 'Xcode 16'
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
