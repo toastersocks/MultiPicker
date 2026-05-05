@@ -8,31 +8,13 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.xcode }} / ${{ matrix.platform }}
+    name: ${{ matrix.xcode }} / ${{ matrix.runtime }}
     runs-on: ${{ matrix.runner }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Xcode 15 / pre-iOS 18
-          - xcode: 'Xcode 15'
-            xcode-version: '15.4'
-            runner: macos-14
-            xcode-path: '/Applications/Xcode_15.4.app'
-            platform: iOS
-            destination-platform: 'iOS Simulator'
-            runtime: 'iOS 17'
-            preferred-device: 'iPhone 15'
-          - xcode: 'Xcode 15'
-            xcode-version: '15.4'
-            runner: macos-14
-            xcode-path: '/Applications/Xcode_15.4.app'
-            platform: watchOS
-            destination-platform: 'watchOS Simulator'
-            runtime: 'watchOS 10'
-            preferred-device: 'Apple Watch Series 9 (41mm)'
-
           # Xcode 16
           - xcode: 'Xcode 16'
             xcode-version: '16.4'
@@ -40,7 +22,26 @@ jobs:
             xcode-path: '/Applications/Xcode_16.4.app'
             platform: iOS
             destination-platform: 'iOS Simulator'
+            runtime: 'iOS 17'
+            runtime-install: 'iOS 17.5'
+            preferred-device: 'iPhone 15'
+          - xcode: 'Xcode 16'
+            xcode-version: '16.4'
+            runner: macos-15
+            xcode-path: '/Applications/Xcode_16.4.app'
+            platform: watchOS
+            destination-platform: 'watchOS Simulator'
+            runtime: 'watchOS 10'
+            runtime-install: 'watchOS 10.5'
+            preferred-device: 'Apple Watch Series 9 (41mm)'
+          - xcode: 'Xcode 16'
+            xcode-version: '16.4'
+            runner: macos-15
+            xcode-path: '/Applications/Xcode_16.4.app'
+            platform: iOS
+            destination-platform: 'iOS Simulator'
             runtime: 'iOS 18'
+            runtime-install: ''
             preferred-device: 'iPhone 16'
           - xcode: 'Xcode 16'
             xcode-version: '16.4'
@@ -49,6 +50,7 @@ jobs:
             platform: watchOS
             destination-platform: 'watchOS Simulator'
             runtime: 'watchOS 11'
+            runtime-install: ''
             preferred-device: 'Apple Watch Series 10 (42mm)'
 
           # Xcode 26.4 / Swift 6.3
@@ -59,6 +61,7 @@ jobs:
             platform: iOS
             destination-platform: 'iOS Simulator'
             runtime: 'iOS 26.4'
+            runtime-install: ''
             preferred-device: 'iPhone 17'
           - xcode: 'Xcode 26.4'
             xcode-version: '26.4'
@@ -67,6 +70,7 @@ jobs:
             platform: watchOS
             destination-platform: 'watchOS Simulator'
             runtime: 'watchOS 26.4'
+            runtime-install: ''
             preferred-device: 'Apple Watch Series 11 (42mm)'
 
     steps:
@@ -98,6 +102,22 @@ jobs:
 
       - name: Show Swift version
         run: swift --version
+
+      - name: Install simulator runtime
+        if: matrix.runtime-install != ''
+        run: |
+          runtime='${{ matrix.runtime }}'
+          runtime_install='${{ matrix.runtime-install }}'
+
+          if xcrun simctl list devices available | grep -Fq -- "-- $runtime"; then
+            echo "$runtime is already installed."
+            exit 0
+          fi
+
+          xcodes version
+          xcodes runtimes | grep -F "$runtime_install" || true
+          mkdir -p "$RUNNER_TEMP/xcodes-runtimes"
+          xcodes runtimes install "$runtime_install" --directory "$RUNNER_TEMP/xcodes-runtimes"
 
       - name: Resolve simulator destination
         id: destination
@@ -170,7 +190,7 @@ jobs:
             -enableCodeCoverage YES
 
       - name: Upload coverage reports to Codecov
-        if: matrix.platform == 'iOS' && matrix.xcode == 'Xcode 16'
+        if: matrix.runtime == 'iOS 18'
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: false
